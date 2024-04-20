@@ -13,6 +13,6 @@ namespace QLTX.Models
         public string? UpdatedBy { get; set; }
         public DateTime? UpdationTime { get; set; }
 
-       // public List<EMotorbike>? Emotors { get; set; }
+       public List<EMotorbike>? Emotors { get; set; }
     }
 }

@@ -11,8 +11,8 @@
         public Company Company { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreationTime { get; set; }
-        public string UpdatedBy { get; set;}
-        public DateTime UpdationTime { get; set; }
+        public string? UpdatedBy { get; set;}
+        public DateTime? UpdationTime { get; set; }
 
     }
 

@@ -12,6 +12,6 @@ public class QLTXDbContext : IdentityDbContext<User>
 
     }
     public DbSet<QLTX.Models.Company> Company { get; set; } = default!;
-    public DbSet<QLTX.Models.EMotorbike> EMotorbikes { get; set; } = default!;
+    public DbSet<QLTX.Models.EMotorbike> EMotorbike { get; set; } = default!;
 
 }
