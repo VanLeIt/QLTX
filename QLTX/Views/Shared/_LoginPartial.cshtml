@@ -1,0 +1,21 @@
+﻿ @using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li><a class="dropdown-item" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a></li>
+         
+        <li >
+             
+            <a class="dropdown-item" asp-action="Logout" asp-controller="Account">Đăng xuất</a>
+        </li>
+    }
+    else
+    {
+        <li><a class="dropdown-item" asp-page="/Account/Login">Đăng nhập</a></li>
+        <li><a class="dropdown-item" asp-page="/Account/Register">Đăng ký</a></li>
+    }
+
+</ul>

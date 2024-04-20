@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QLTX", "QLTX\QLTX.csproj", "{B453A7E0-DA39-4BA7-9229-F8AEF112CF18}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B453A7E0-DA39-4BA7-9229-F8AEF112CF18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B453A7E0-DA39-4BA7-9229-F8AEF112CF18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B453A7E0-DA39-4BA7-9229-F8AEF112CF18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B453A7E0-DA39-4BA7-9229-F8AEF112CF18}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3375F7CB-819B-4F1A-9801-E86A12366F43}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,90 @@
+﻿@using QLTX.ViewModels;
+@model RegisterVM
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = "";
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <title>Register - SB Admin</title>
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-pink">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-5">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
+                                <div class="card-body">
+                                    <form asp-action="Register" method="post">
+                                        <div asp-validation-summary="ModelOnly"></div>
+										 
+                                        <div class="form-floating mb-3">
+											
+                                            <input class="form-control" asp-for="FullName" />
+											<label for="FullName">Tên đầy đủ</label>
+                                            <span asp-validation-for="FullName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                           
+                                            <input class="form-control" asp-for="Address" />
+											<label for="Address">Địa chỉ</label>
+                                            <span asp-validation-for="Address" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            
+                                            <input class="form-control" asp-for="PhoneNumber" />
+											<label for="PhoneNumber">Số điện thoại</label>
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" asp-for="Email" />
+                                            <label for="Email">Email</label>
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" asp-for="Password" />
+                                            <label for="Password">Mật khẩu</label>
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" asp-for="ConfirmPassword" />
+                                            <label for="ConfirmPassword">Nhập lại mật khẩu</label>
+                                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                            <a class="small text-decoration-none" asp-action="Login">Đăng nhập</a>
+
+                                            <input type="submit" value="Register" class="btn btn-primary" />
+
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/scripts.js"></script>
+
+</body>
+@* @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} *@
