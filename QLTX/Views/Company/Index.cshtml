@@ -3,17 +3,21 @@
 @{
 	ViewData["Title"] = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
+	 int index = 0; 
 }
 
-
+ 
 <main>
 	<div class="container-fluid px-4">
 		<h2 class="mt-4">
-			Danh sách loại xe
+			Danh sách
 		</h2>
-		<ol class="breadcrumb mb-4">
-			<li class="breadcrumb-item active">Dashboard</li>
-		</ol>
+		@if (ViewBag.SuccessMessage != null)
+		{
+			<div id="successMessage" class="alert alert-success alert-sm text-sm" role="alert">
+				@ViewBag.SuccessMessage
+			</div>
+		}
 		<p>
 			<a asp-action="Create" class="btn btn-primary" id="openCreateModal">Thêm mới </a>
 		</p>
@@ -21,59 +25,78 @@
 		<div class="card mb-4">
 			<div class="card-header">
 				<i class="fas fa-table me-1"></i>
-				Danh sách loại xe
+				Danh sách hãng xe
 			</div>
-			<div class="card-body">
-				<table id="datatablesSimple">
+			<div class="card-body table-responsive">
+				<table id="datatablesSimple" class="table table-striped" style="width:100%">
 					<thead>
 						<tr>
 							<th>
-								@Html.DisplayNameFor(model => model.Name)
+								STT
 							</th>
 							<th>
-								@Html.DisplayNameFor(model => model.Description)
-							</th>
-							<th>
-								@Html.DisplayNameFor(model => model.CreatedBy)
-							</th>
-							<th>
-								@Html.DisplayNameFor(model => model.CreationTime)
+								Tên hãng
 							</th>
 							 
-							<th></th>
+							<th>
+								Tạo bởi
+							</th>
+							<th>
+								Ngày tao
+							</th>
+							<th>
+								Người sửa cuối
+							</th>
+							<th>
+								Ngày sửa cuối
+							</th>
+							<th class="text-center text-lg-center"><i class="fas fa-sliders-h"></i></th>
 						</tr>
 					</thead>
 					<tbody>
-						@foreach (var item in Model)
+						@if (Model != null)
 						{
-							<tr>
-								<td>
-									@Html.DisplayFor(modelItem => item.Name)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.Description)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.CreatedBy)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.CreationTime)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.UpdatedBy)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.UpdationTime)
-								</td>
-								<td>
-									<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-									<a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-									<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+							
+							@foreach (var item in Model)
+							{
+								<tr >
+									<td>
+										@((++index))
+									</td>
+									<td>
+										@item.Name
+									</td>
+									 
+									<td>
+										@Html.DisplayFor(modelItem => item.CreatedBy)
+									</td>
+									<td>
+										@item.CreationTime.ToString("dd/MM/yyyy HH:mm")
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.UpdatedBy)
+									</td>
+									<td>
+										@if (item.UpdationTime.HasValue)
+										{
+											@item.UpdationTime.Value.ToString("dd/MM/yyyy HH:mm")
+										}
+										else
+										{
+										}
+									</td>
+									<td class="text-center text-lg-center">
+										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="  margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
+										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
+
+										<a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
+											<i class="fas fa-trash-alt fa-lg"></i>
+										</a>
 
 
-
-								</td>
-							</tr>
+									</td>
+								</tr>
+							}
 						}
 					</tbody>
 				</table>
@@ -81,3 +104,81 @@
 		</div>
 	</div>
 </main>
+ 
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Bạn có chắc muốn xóa mục này !
+			</div>
+			<div class="modal-footer">
+				 <form id="deleteForm" method="post">
+                    <input type="hidden" id="deleteItemId" />
+                    <button type="submit" class="btn btn-danger">Xác nhận</button>
+                </form>
+				 
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				 
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+	@section Scripts{
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script>
+		setTimeout(function () {
+			var successMessage = document.getElementById("successMessage");
+			if (successMessage) {
+				successMessage.style.display = "none";
+			}
+		}, 3000);
+		 
+		 
+			function Confirm(id) {
+				 
+				document.getElementById('deleteItemId').value = id;
+			}
+
+		 
+		document.getElementById('deleteForm').addEventListener('submit', function (event) {
+			event.preventDefault(); 
+			var id = document.getElementById('deleteItemId').value;
+		 
+			$.ajax({
+				url: '/Company/Delete/' + id,
+				type: 'POST',
+				success: function (response) {
+					if (response) {
+						 
+						window.location.reload();
+					} else {
+						 
+						alert('Đã xảy ra lỗi khi xóa mục này.');
+					}
+				},
+				error: function () {
+					 
+					alert('Đã xảy ra lỗi khi gửi yêu cầu xóa.');
+				}
+			});
+		});
+
+
+		 
+			 
+	</script>
+
+
+}

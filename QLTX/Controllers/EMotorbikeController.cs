@@ -17,20 +17,20 @@ namespace QLTX.Controllers
         // GET: EMotorbike
         public async Task<IActionResult> Index()
         {
-            return _context.EMotorbike != null ?
-                        View(await _context.EMotorbike.ToListAsync()) :
+            return _context.EMotorbikes != null ?
+                        View(await _context.EMotorbikes.ToListAsync()) :
                         Problem("Entity set 'QLTXDbContext.EMotorbike'  is null.");
         }
 
         // GET: EMotorbike/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.EMotorbike == null)
+            if (id == null || _context.EMotorbikes == null)
             {
                 return NotFound();
             }
 
-            var emotor = await _context.EMotorbike
+            var emotor = await _context.EMotorbikes
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (emotor == null)
             {
@@ -71,12 +71,12 @@ namespace QLTX.Controllers
         // GET: EMotorbike/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.EMotorbike == null)
+            if (id == null || _context.EMotorbikes == null)
             {
                 return NotFound();
             }
 
-            var emotor = await _context.EMotorbike.FindAsync(id);
+            var emotor = await _context.EMotorbikes.FindAsync(id);
             if (emotor == null)
             {
                 return NotFound();
@@ -125,12 +125,12 @@ namespace QLTX.Controllers
         // GET: EMotorbike/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.EMotorbike == null)
+            if (id == null || _context.EMotorbikes == null)
             {
                 return NotFound();
             }
 
-            var emotor = await _context.EMotorbike
+            var emotor = await _context.EMotorbikes
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (emotor == null)
             {
@@ -145,14 +145,14 @@ namespace QLTX.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.EMotorbike == null)
+            if (_context.EMotorbikes == null)
             {
                 return Problem("Entity set 'QLTXDbContext.EMotorbike'  is null.");
             }
-            var emotor = await _context.EMotorbike.FindAsync(id);
+            var emotor = await _context.EMotorbikes.FindAsync(id);
             if (emotor != null)
             {
-                _context.EMotorbike.Remove(emotor);
+                _context.EMotorbikes.Remove(emotor);
             }
 
             await _context.SaveChangesAsync();
@@ -161,7 +161,7 @@ namespace QLTX.Controllers
 
         private bool EMotorbikeExists(int id)
         {
-            return (_context.EMotorbike?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.EMotorbikes?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

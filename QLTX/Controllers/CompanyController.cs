@@ -24,21 +24,25 @@ namespace QLTX.Controllers
         // GET: Company
         public async Task<IActionResult> Index()
         {
-              return _context.Company != null ? 
-                          View(await _context.Company.ToListAsync()) :
+            if (TempData.ContainsKey("SuccessMessage"))
+            {
+                ViewBag.SuccessMessage = TempData["SuccessMessage"];
+            }
+            return _context.Companies != null ? 
+                          View(await _context.Companies.ToListAsync()) :
                           Problem("Entity set 'QLTXDbContext.Company'  is null.");
         }
 
         // GET: Company/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Company == null)
+            if (id == null || _context.Companies == null)
             {
                 return NotFound();
             }
 
-            var company = await _context.Company
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var company = await _context.Companies
+				.FirstOrDefaultAsync(m => m.Id == id);
             if (company == null)
             {
                 return NotFound();
@@ -53,37 +57,46 @@ namespace QLTX.Controllers
             return View();
         }
 
-        // POST: Company/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+         
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Description ")] Company company)
-        {   
-
-            company.CreatedBy = User.Identity.Name;
+        {
+			if (CompanyExists(company.Name))
+			{
+				 
+				ModelState.AddModelError("Name", "Tên hãng xe đã tồn tại.");
+				return View(company);  
+			}
+            if (!ModelState.IsValid)
+            {
+			company.CreatedBy = User.Identity.Name;
             company.CreationTime = DateTime.Now;
             company.UpdatedBy = null;
             company.UpdationTime = null;
-            if (!ModelState.IsValid)
-            {
+           
                 
                 _context.Add(company);
-                await _context.SaveChangesAsync(); 
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Thêm mới thành công.";
                 return RedirectToAction(nameof(Index));
             }
             return View(company);
         }
+		private bool CompanyExists(string name)
+		{
+			return _context.Companies.Any(c => c.Name == name);
+		}
 
-        // GET: Company/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+		// GET: Company/Edit/5
+		public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Company == null)
+            if (id == null || _context.Companies == null)
             {
                 return NotFound();
             }
 
-            var company = await _context.Company.FindAsync(id);
+            var company = await _context.Companies.FindAsync(id);
             if (company == null)
             {
                 return NotFound();
@@ -91,19 +104,24 @@ namespace QLTX.Controllers
             return View(company);
         }
 
-        // POST: Company/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CreatedBy,CreationTime,UpdatedBy,UpdationTime")] Company company)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Company company)
         {
             if (id != company.Id)
             {
                 return NotFound();
             }
-             
-             
+			var existingCompany = await _context.Companies.FirstOrDefaultAsync(c => c.Name == company.Name && c.Id != company.Id);
+			if (existingCompany != null)
+			{
+				ModelState.AddModelError("Name", "Tên đã tồn tại. Vui lòng chọn tên khác.");
+				return View(company);
+			}
+			var originalCompany = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(c => c.Id == company.Id);
+            company.CreatedBy = originalCompany.CreatedBy;
+            company.CreationTime = originalCompany.CreationTime;
             company.UpdatedBy = User.Identity.Name;
             company.UpdationTime = DateTime.Now;
             if (!ModelState.IsValid)
@@ -112,6 +130,7 @@ namespace QLTX.Controllers
                 {
                     _context.Update(company);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Cập nhật thành công.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -130,32 +149,17 @@ namespace QLTX.Controllers
         }
 
         // GET: Company/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Company == null)
-            {
-                return NotFound();
-            }
 
-            var company = await _context.Company
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-
-            return View(company);
-        }
 
         // POST: Company/Delete/5
-        [HttpPost, ActionName("Delete")]
+        /*[HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Company == null)
             {
-                return Problem("Entity set 'QLTXDbContext.Company'  is null.");
-            }
+				return NotFound();
+			}
             var company = await _context.Company.FindAsync(id);
             if (company != null)
             {
@@ -164,11 +168,41 @@ namespace QLTX.Controllers
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }*/
+      /*  [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var company = await _context.Company.FindAsync(id);
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            _context.Company.Remove(company);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }*/
+
+        public JsonResult Delete(int id)
+        {
+            bool result = false;
+
+            var company = _context.Companies.Find(id);
+            if (company != null)
+            {
+                result = true;
+                _context.Companies.Remove(company);
+                _context.SaveChanges();
+				TempData["SuccessMessage"] = "Đã xóa thành công.";
+			}
+            return Json(result); 
         }
 
         private bool CompanyExists(int id)
         {
-          return (_context.Company?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Companies?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
