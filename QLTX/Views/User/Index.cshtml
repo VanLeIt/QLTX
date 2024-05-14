@@ -1,5 +1,5 @@
-﻿@model IEnumerable<QLTX.Models.EMotorbike>
-  
+﻿@model IEnumerable<QLTX.Models.User>
+
 @{
 	ViewData["Title"] = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,7 +25,7 @@
 		<div class="card mb-4">
 			<div class="card-header">
 				<i class="fas fa-table me-1"></i>
-				Danh sách xe cho thuê
+				Danh sách người dùng
 			</div>
 			<div class="card-body table-responsive">
 				<table id="datatablesSimple" class="table table-striped" style="width:100%">
@@ -35,21 +35,22 @@
 								STT
 							</th>
 							<th>
-								Biển số xe
+								Email / Tên đăng nhập
 							</th>
 							<th>
-								Số khung xe
+								Tên đầy đủ
+							</th>
+							 
+							<th>
+								Số điện thoại
 							</th>
 							<th>
-								Loại xe
-							</th> 
-							<th>
-								Trạng thái
+								Quyền
 							</th>
 							<th>
 								Tạo bởi
 							</th>
-							 
+
 							<th class="text-center text-lg-center"><i class="fas fa-sliders-h"></i></th>
 						</tr>
 					</thead>
@@ -63,18 +64,23 @@
 									<td>
 										@((++index))
 									</td>
-									<td>
+									<td style="text-align:center;">
+										<a asp-action="Details" style="text-decoration: none; color: black" asp-route-id="@item.Id">@item.UserName</a>
 
-										<a asp-action="Details" style="text-decoration: none; color: black" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.License)</a>
+									</td>
+									<td style="text-align:center;">
+										@item.FullName
+									</td>
+									 
+									<td>
+										@item.PhoneNumber
 									</td>
 									<td>
-										@Html.DisplayFor(modelItem => item.VinNumber)
-									</td>
-									<td>
-										@Html.DisplayFor(modelItem => item.TypeMotorbike.Name)
-									</td>
-									<td>
-										@Html.DisplayFor(modelItem => item.Status)
+										@foreach (var userRole in item.UserRoles)
+										{
+											@userRole.Role.Name
+											 
+										}
 									</td>
 									<td style="text-align:center;">
 										<div>
@@ -84,7 +90,7 @@
 											@item.CreationTime.ToString("dd/MM/yyyy HH:mm")
 										</div>
 									</td>
-									 
+
 									<td class="text-center text-lg-center">
 										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="  margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
 										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
@@ -157,7 +163,7 @@
 			var id = document.getElementById('deleteItemId').value;
 
 			$.ajax({
-				url: '/EMotorbike/Delete/' + id,
+				url: '/TypeMotorbike/Delete/' + id,
 				type: 'POST',
 				success: function (response) {
 					if (response) {

@@ -3,10 +3,10 @@
 @{
 	ViewData["Title"] = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
-	 int index = 0; 
+	int index = 0;
 }
 
- 
+
 <main>
 	<div class="container-fluid px-4">
 		<h2 class="mt-4">
@@ -37,54 +37,38 @@
 							<th>
 								Tên hãng
 							</th>
-							 
+
 							<th>
 								Tạo bởi
 							</th>
-							<th>
-								Ngày tao
-							</th>
-							<th>
-								Người sửa cuối
-							</th>
-							<th>
-								Ngày sửa cuối
-							</th>
+
 							<th class="text-center text-lg-center"><i class="fas fa-sliders-h"></i></th>
 						</tr>
 					</thead>
 					<tbody>
 						@if (Model != null)
 						{
-							
+
 							@foreach (var item in Model)
 							{
-								<tr >
+								<tr>
 									<td>
 										@((++index))
 									</td>
 									<td>
-										@item.Name
+										<a asp-action="Details" style="text-decoration: none; color: black" asp-route-id="@item.Id">@item.Name</a>
+
 									</td>
-									 
-									<td>
-										@Html.DisplayFor(modelItem => item.CreatedBy)
+
+									<td style="text-align:center;">
+										<div>
+											@Html.DisplayFor(modelItem => item.CreatedBy)
+										</div>
+										<div>
+											@item.CreationTime.ToString("dd/MM/yyyy HH:mm")
+										</div>
 									</td>
-									<td>
-										@item.CreationTime.ToString("dd/MM/yyyy HH:mm")
-									</td>
-									<td>
-										@Html.DisplayFor(modelItem => item.UpdatedBy)
-									</td>
-									<td>
-										@if (item.UpdationTime.HasValue)
-										{
-											@item.UpdationTime.Value.ToString("dd/MM/yyyy HH:mm")
-										}
-										else
-										{
-										}
-									</td>
+
 									<td class="text-center text-lg-center">
 										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="  margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
 										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
@@ -104,7 +88,7 @@
 		</div>
 	</div>
 </main>
- 
+
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -118,13 +102,13 @@
 				Bạn có chắc muốn xóa mục này !
 			</div>
 			<div class="modal-footer">
-				 <form id="deleteForm" method="post">
-                    <input type="hidden" id="deleteItemId" />
-                    <button type="submit" class="btn btn-danger">Xác nhận</button>
-                </form>
-				 
+				<form id="deleteForm" method="post">
+					<input type="hidden" id="deleteItemId" />
+					<button type="submit" class="btn btn-danger">Xác nhận</button>
+				</form>
+
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				 
+
 			</div>
 		</div>
 	</div>
@@ -133,7 +117,7 @@
 
 
 
-	@section Scripts{
+@section Scripts {
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
@@ -144,40 +128,40 @@
 				successMessage.style.display = "none";
 			}
 		}, 3000);
-		 
-		 
-			function Confirm(id) {
-				 
-				document.getElementById('deleteItemId').value = id;
-			}
 
-		 
+
+		function Confirm(id) {
+
+			document.getElementById('deleteItemId').value = id;
+		}
+
+
 		document.getElementById('deleteForm').addEventListener('submit', function (event) {
-			event.preventDefault(); 
+			event.preventDefault();
 			var id = document.getElementById('deleteItemId').value;
-		 
+
 			$.ajax({
 				url: '/Company/Delete/' + id,
 				type: 'POST',
 				success: function (response) {
 					if (response) {
-						 
+
 						window.location.reload();
 					} else {
-						 
+
 						alert('Đã xảy ra lỗi khi xóa mục này.');
 					}
 				},
 				error: function () {
-					 
+
 					alert('Đã xảy ra lỗi khi gửi yêu cầu xóa.');
 				}
 			});
 		});
 
 
-		 
-			 
+
+
 	</script>
 
 

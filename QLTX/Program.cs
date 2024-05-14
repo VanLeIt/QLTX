@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using QLTX.Data;
 using QLTX.Models;
 
@@ -11,7 +12,12 @@ var connectionString = builder.Configuration.GetConnectionString("qltx") ?? thro
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<QLTXDbContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{ 
+	options.ValidationInterval = TimeSpan.FromHours(24);  
+});
+builder.Services.AddScoped<UserRoles>();
+builder.Services.AddIdentity<User, Role>(options =>
     {
     //options.SignIn.RequireConfirmedAccount = true;
         options.Password.RequireDigit = true;

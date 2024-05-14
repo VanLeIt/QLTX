@@ -1,0 +1,83 @@
+﻿@model QLTX.Models.TypeMotorbike
+
+@{
+	ViewData["Title"] = "Create";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main>
+	<div class="container-fluid px-4">
+		<h2 class="mt-4">Thêm mới</h2>
+		<ol class="breadcrumb mb-4">
+			<li class="breadcrumb-item active">Loại xe</li>
+		</ol>
+
+		<hr />
+		<div class="row">
+			<div class="col-md-4">
+				<form asp-action="Create">
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+					<div class="mb-3">
+
+						<label asp-for="Name" class="control-label mb-2">Tên loại xe</label>
+						<input asp-for="Name" class="form-control" />
+						<span asp-validation-for="Name" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+
+						<label asp-for="Power" class="control-label mb-2">Công suất</label>
+						<input asp-for="Power" class="form-control" />
+						<span asp-validation-for="Power" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+
+						<label asp-for="Speed" class="control-label mb-2">Tốc độ</label>
+						<input asp-for="Speed" class="form-control" />
+						<span asp-validation-for="Speed" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+
+						<label asp-for="Battery" class="control-label mb-2">Thời lượng pin</label>
+						<input asp-for="Battery" class="form-control" />
+						<span asp-validation-for="Battery" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+
+						<label asp-for="Charging" class="control-label mb-2">Thời gian sạc</label>
+						<input asp-for="Charging" class="form-control" />
+						<span asp-validation-for="Charging" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+						<label asp-for="CompanyId" class="control-label mb-2">Hãng xe</label>
+						<select asp-for="CompanyId" class="form-control" asp-items="ViewBag.CompanyId">
+							 
+						</select>
+						<span asp-validation-for="CompanyId" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+						<label asp-for="Description" class="control-label mb-2">Mô tả</label>
+						<input asp-for="Description" class="form-control" />
+						<span asp-validation-for="Description" class="text-danger"></span>
+					</div>
+
+					<div class="form-group d-flex justify-content-between align-items-center">
+						<a asp-action="Index" class="btn btn-secondary">Đóng</a>
+						<button type="submit" class="btn btn-primary">
+							<i class="fas fa-save"></i> Lưu
+						</button>
+
+					</div>
+				</form>
+			</div>
+		</div>
+
+
+	</div>
+</main>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

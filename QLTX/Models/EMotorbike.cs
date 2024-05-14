@@ -9,6 +9,7 @@ namespace QLTX.Models
 		public int Id { get; set; }
 		public int TypeMotorbikeId { get; set; }
 		public TypeMotorbike TypeMotorbike { get; set; }
+		public string VinNumber { get; set; }
 		public string License { get; set; }
 		public string? Description { get; set; }
         public EMotorbikeStatus Status { get; set; } = EMotorbikeStatus.Ready;
@@ -22,9 +23,14 @@ namespace QLTX.Models
 
     public enum EMotorbikeStatus
     {
-        Ready = 0,
-        Broken = 1,
-        Renting = 2,
-    }
+		[Display(Name = "Sẵn sàng")]
+		Ready = 0,
+
+		[Display(Name = "Đang hỏng")]
+		Broken = 1,
+
+		[Display(Name = "Đang thuê")]
+		Renting = 2
+	}
 }
 

@@ -6,23 +6,29 @@ using QLTX.Models;
 
 namespace QLTX.Data;
 
-public class QLTXDbContext : IdentityDbContext<User>
+public class QLTXDbContext : IdentityDbContext<User, Role, string,
+		IdentityUserClaim<string>, UserRoles, IdentityUserLogin<string>,
+		IdentityRoleClaim<string>, IdentityUserToken<string>>
 {
-    public QLTXDbContext(DbContextOptions<QLTXDbContext> options) : base(options)
-    {
+	public QLTXDbContext(DbContextOptions<QLTXDbContext> options) : base(options)
+	{
 
-    }
-    public DbSet<Company> Companies { get; set; } = default!;
+	}
+	public DbSet<Company> Companies { get; set; } = default!;
 	public DbSet<TypeMotorbike> TypeMotorbikes { get; set; } = default!;
-    public DbSet<EMotorbike> EMotorbikes { get; set; } = default!;
-	public DbSet<User> Users {  get; set; } = default!;
+	public DbSet<EMotorbike> EMotorbikes { get; set; } = default!;
+	//public DbSet<User> Users { get; set; } = default!;
 	public DbSet<Rental> Rentals { get; set; } = default!;
 	public DbSet<RentalDetail> RentalDetails { get; set; } = default!;
 	public DbSet<Customer> Customers { get; set; } = default!;
 	public DbSet<Bill> Bills { get; set; } = default!;
+	//public DbSet<Role> Roles { get; set; } = default!;
+	//public DbSet<UserRoles> UserRoles { get; set; } = default!;
+
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		base.OnModelCreating(modelBuilder);
 		modelBuilder.Entity<TypeMotorbike>()
 			.HasOne<Company>(s => s.Company)
 			.WithMany(g => g.TypeMotorbikes)
@@ -35,8 +41,7 @@ public class QLTXDbContext : IdentityDbContext<User>
 
 		modelBuilder.Entity<RentalDetail>()
 		.HasKey(rd => new { rd.EMotorbileId, rd.RentalId });
-
-		// Quan hệ n-n giữa EMotorbike và Rental
+		 
 		modelBuilder.Entity<RentalDetail>()
 			.HasOne(rd => rd.EMotorbike)
 			.WithMany()
@@ -46,15 +51,66 @@ public class QLTXDbContext : IdentityDbContext<User>
 			.HasOne(rd => rd.Rental)
 			.WithMany()
 			.HasForeignKey(rd => rd.RentalId);
+		modelBuilder.Entity<User>(b =>
+		{
+			b.ToTable("Users");
+			b.HasMany(e => e.Claims)
+				.WithOne()
+				.HasForeignKey(uc => uc.UserId)
+				.IsRequired(); 
+
+			b.HasMany(e => e.Logins)
+				.WithOne()
+				.HasForeignKey(ul => ul.UserId)
+				.IsRequired(); 
+
+			b.HasMany(e => e.Tokens)
+				.WithOne()
+				.HasForeignKey(ut => ut.UserId)
+				.IsRequired();
+			 
+			b.HasMany(e => e.UserRoles)
+				.WithOne(e => e.User)
+				.HasForeignKey(ur => ur.UserId)
+				.IsRequired();
+		});
+
+		modelBuilder.Entity<Role>(b =>
+		{
+			b.ToTable("Roles");
+			b.HasMany(e => e.UserRoles)
+				.WithOne(e => e.Role)
+				.HasForeignKey(ur => ur.RoleId)
+				.IsRequired();
+		});
+
+		modelBuilder.Entity<IdentityUserClaim<string>>(b =>
+		{
+			b.ToTable("UserClaims");
+		});
+
+		modelBuilder.Entity<IdentityUserLogin<string>>(b =>
+		{
+			b.ToTable("UserLogins");
+			b.HasKey(login => new { login.LoginProvider, login.ProviderKey });
+		});
+
+		modelBuilder.Entity<IdentityUserToken<string>>(b =>
+		{
+			b.ToTable("UserTokens");
+		});
+
+		modelBuilder.Entity<IdentityRoleClaim<string>>(b =>
+		{
+			b.ToTable("RoleClaims");
+		});
+
+		modelBuilder.Entity<UserRoles>(b =>
+		{
+			b.ToTable("UserRoles");
+		});
+
 		modelBuilder.Entity<IdentityUserLogin<string>>()
-		.HasKey(l => l.UserId);
-		modelBuilder.Entity<IdentityUserRole<string>>()
-		.HasKey(ur => new { ur.UserId, ur.RoleId });
-		modelBuilder.Entity<IdentityUserToken<string>>()
-		.HasKey(ut => new { ut.UserId, ut.LoginProvider, ut.Name });
-		modelBuilder.Entity<Rental>()
-		.HasOne(r => r.User)
-		.WithMany(u => u.Rentals)
-		.HasForeignKey(r => r.UserId);
+			.HasKey(login => new { login.LoginProvider, login.ProviderKey });
 	}
 }
