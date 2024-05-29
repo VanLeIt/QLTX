@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QLTX.Data;
 using QLTX.Models;
+using QLTX.ViewModels;
 
 namespace QLTX.Controllers
 {
-	public class UserController : Controller
+    [Authorize(Roles = "admin")]
+    public class UserController : Controller
 	{
 		private readonly QLTXDbContext _context;
 		private readonly UserManager<User> _userManager;
@@ -29,10 +32,7 @@ namespace QLTX.Controllers
 			{
 				ViewBag.SuccessMessage = TempData["SuccessMessage"];
 			}
-			//return _context.Users != null ?
-			//			  View(await _context.Users.Include(u => u.UserRoles)
-			//	.ThenInclude(ur => ur.Role).Where().ToListAsync()) :
-			//			  Problem("Người dùng không tồn tại.");
+			 
 			var usersWithRoles = await _context.Users
 				.Include(u => u.UserRoles)
 				.ThenInclude(ur => ur.Role)
@@ -55,141 +55,287 @@ namespace QLTX.Controllers
 			if (id == null || _context.Users == null)
 			{
 				return NotFound();
-			}
-
+			} 
 			var user = await _context.Users
-
+				.Include(u => u.UserRoles)
+				.ThenInclude(ur => ur.Role)
 				.FirstOrDefaultAsync(m => m.Id == id);
 			if (user == null)
 			{
 				return NotFound();
 			}
+            var model = new UserDetailsViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FullName = user.FullName,
+                Address = user.Address,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                CreatedBy = user.CreatedBy,
+                CreationTime = user.CreationTime,
+                UpdatedBy = user.UpdatedBy,
+                UpdationTime = user.UpdationTime,
+                Roles = user.UserRoles.Select(ur => ur.Role.Name).ToList()
+            };
 
-			return View(user);
+            return View(model);
+           
 		}
-
-		// GET: TypeMotorbike/Create
+ 
 		public IActionResult Create()
 		{
-			ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Name");
-			return View();
+             
+            return View();
 		}
 
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("Id,Name,Power,Speed,Battery,Charging,CompanyId,Description ")] TypeMotorbike typeMotorbikes)
+		public async Task<IActionResult> Create(CreateUserViewModel input)
 		{
-			if (TypeMotorbikeExists(typeMotorbikes.Name))
+			if (UsersExists(input.Email))
 			{
 
-				ModelState.AddModelError("Name", "Tên loai xe đã tồn tại.");
-				return View(typeMotorbikes);
+				ModelState.AddModelError("Email", "Tên người dùng đã tồn tại.");
+                
+                return View(input);
 			}
-			ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", typeMotorbikes.CompanyId);
+			 
 			if (!ModelState.IsValid)
 			{
-				typeMotorbikes.CreatedBy = User.Identity.Name;
-				typeMotorbikes.CreationTime = DateTime.Now;
-				typeMotorbikes.UpdatedBy = null;
-				typeMotorbikes.UpdationTime = null;
+                var user = new User
+                {
+                    UserName = input.Email,
+                    FullName = input.FullName,
+                    Address = input.Address,
+                    Email =  input.Email,
+                    PhoneNumber = input.PhoneNumber,
+                    CreatedBy = User.Identity.Name,
+                    CreationTime = DateTime.Now, 
+                    UpdatedBy = null,
+                    UpdationTime = null
+                };
+               
 
-
-				_context.Add(typeMotorbikes);
+                var result = await _userManager.CreateAsync(user, input.Password!);
+				 
 				await _context.SaveChangesAsync();
 				TempData["SuccessMessage"] = "Thêm mới thành công.";
 				return RedirectToAction(nameof(Index));
+				 
 			}
-			return View(typeMotorbikes);
+           
+          
+            return View(input);
 		}
-		private bool TypeMotorbikeExists(string name)
+		private bool UsersExists(string name)
 		{
-			return _context.TypeMotorbikes.Any(c => c.Name == name);
+			return _context.Users.Any(c => c.Email == name);
 		}
 
-		// GET: TypeMotorbike/Edit/5
-		public async Task<IActionResult> Edit(int? id)
+		public async Task<IActionResult> Edit(string id)
 		{
-			if (id == null || _context.TypeMotorbikes == null)
+			if (id == null || _context.Users == null)
 			{
 				return NotFound();
 			}
 
-			var typeMotorbikes = await _context.TypeMotorbikes.FindAsync(id);
-			if (typeMotorbikes == null)
+			var user = await _context.Users.FindAsync(id);
+			if (user == null)
 			{
 				return NotFound();
 			}
-			ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", typeMotorbikes.CompanyId);
-			return View(typeMotorbikes);
-		}
 
+		 
+			var model = new CreateUserViewModel
+			{
+				FullName = user.FullName,
+				Address = user.Address,
+				Email = user.Email,
+				PhoneNumber = user.PhoneNumber,
+			 
+			};
+
+			return View(model);
+		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Power,Speed,Battery,Charging,CompanyId,Description")] TypeMotorbike typeMotorbikes)
+		public async Task<IActionResult> Edit(string id, CreateUserViewModel model)
 		{
-			if (id != typeMotorbikes.Id)
+			if (id != model.Id)
 			{
 				return NotFound();
 			}
-			var existingTypeMotorbike = await _context.TypeMotorbikes.FirstOrDefaultAsync(c => c.Name == typeMotorbikes.Name && c.Id != typeMotorbikes.Id);
-			if (existingTypeMotorbike != null)
-			{
-				ModelState.AddModelError("Name", "Tên đã tồn tại. Vui lòng chọn tên khác.");
-				return View(typeMotorbikes);
-			}
-			ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", typeMotorbikes.CompanyId);
-			var originalTypeMotorbike = await _context.TypeMotorbikes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == typeMotorbikes.Id);
-			typeMotorbikes.CreatedBy = originalTypeMotorbike.CreatedBy;
-			typeMotorbikes.CreationTime = originalTypeMotorbike.CreationTime;
 
-			if (!ModelState.IsValid)
+			if (ModelState.IsValid)
 			{
-				typeMotorbikes.UpdatedBy = User.Identity.Name;
-				typeMotorbikes.UpdationTime = DateTime.Now;
-				try
-				{
-					_context.Update(typeMotorbikes);
-					await _context.SaveChangesAsync();
-					TempData["SuccessMessage"] = "Cập nhật thành công.";
-				}
-				catch (DbUpdateConcurrencyException)
-				{
-					if (!TypeMotorbikeExists(typeMotorbikes.Id))
-					{
-						return NotFound();
-					}
-					else
-					{
-						throw;
-					}
-				}
+				return View(model);
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			user.FullName = model.FullName;
+			user.Address = model.Address;
+			user.Email = model.Email;
+			user.PhoneNumber = model.PhoneNumber; 
+			var result = await _userManager.UpdateAsync(user);
+			if (result.Succeeded)
+			{
 				return RedirectToAction(nameof(Index));
 			}
-			return View(typeMotorbikes);
+
+			foreach (var error in result.Errors)
+			{
+				ModelState.AddModelError(string.Empty, error.Description);
+			}
+
+			return View(model);
 		}
-
-
-
-		public JsonResult Delete(int id)
+		 
+		public async Task<JsonResult> Delete(string? id)
 		{
 			bool result = false;
 
-			var typeMotorbikes = _context.TypeMotorbikes.Find(id);
-			if (typeMotorbikes != null)
+			if (id == null)
 			{
+				return Json(result);
+			}
+
+			var user = await _context.Users
+									 .Include(u => u.UserRoles)
+									 .FirstOrDefaultAsync(u => u.Id == id);
+
+			if (user != null)
+			{
+				// Xóa các vai trò của người dùng từ bảng UserRoles
+				var userRoles = _context.UserRoles.Where(ur => ur.UserId == id);
+				_context.UserRoles.RemoveRange(userRoles);
+
+				// Xóa người dùng từ bảng Users
+				_context.Users.Remove(user);
+
+				await _context.SaveChangesAsync();
+
 				result = true;
-				_context.TypeMotorbikes.Remove(typeMotorbikes);
-				_context.SaveChanges();
 				TempData["SuccessMessage"] = "Đã xóa thành công.";
 			}
+
 			return Json(result);
 		}
 
-		private bool TypeMotorbikeExists(int id)
+		public async Task<bool> ChangeRole(UserRolesDto userRoles)
 		{
-			return (_context.TypeMotorbikes?.Any(e => e.Id == id)).GetValueOrDefault();
+			var result = false;
+
+			// Lấy thông tin người dùng dựa trên UserId
+			var user = await _context.Users
+				.Include(u => u.UserRoles)
+				.FirstOrDefaultAsync(u => u.Id == userRoles.UserId);
+
+			if (user != null)
+			{
+				// Xóa các quyền hiện tại của người dùng
+				_context.UserRoles.RemoveRange(user.UserRoles);
+
+				// Thêm quyền mới
+				foreach (var roleId in userRoles.RoleIds)
+				{
+					_context.UserRoles.Add(new UserRoles
+					{
+						UserId = userRoles.UserId,
+						RoleId = roleId
+					});
+				}
+
+				// Lưu các thay đổi
+				await _context.SaveChangesAsync();
+				result = true;
+			}
+
+			return result;
+
+		}
+
+        [Authorize(Roles = "admin")]
+        [HttpGet]
+		public async Task<IActionResult> EditRoles(string? id)
+		{
+			var user = await _context.Users
+			.Include(u => u.UserRoles)
+			.ThenInclude(ur => ur.Role)
+			.FirstOrDefaultAsync(u => u.Id == id);
+
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			var roles = await _context.Roles.ToListAsync();
+			var model = new UserRoleViewModel
+			{
+				UserId = user.Id,
+				UserName = user.UserName,
+				AvailableRoles = roles.Select(r => new SelectListItem
+				{
+					Value = r.Id,
+					Text = r.Name
+				}).ToList(),
+				SelectedRoles = user.UserRoles.Select(ur => ur.RoleId).ToList()
+			};
+
+			return View(model);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> EditRoles(UserRoleViewModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				var roles = await _context.Roles.ToListAsync();
+				model.AvailableRoles = roles.Select(r => new SelectListItem
+				{
+					Value = r.Id,
+					Text = r.Name
+				}).ToList();
+				return View(model);
+			}
+
+			var user = await _context.Users
+				.Include(u => u.UserRoles)
+				.FirstOrDefaultAsync(u => u.Id == model.UserId);
+
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			// Xóa các quyền hiện tại
+			_context.UserRoles.RemoveRange(user.UserRoles);
+
+			// Thêm quyền mới
+			foreach (var roleId in model.SelectedRoles)
+			{
+				_context.UserRoles.Add(new UserRoles
+				{
+					UserId = user.Id,
+					RoleId = roleId
+				});
+			}
+
+			await _context.SaveChangesAsync();
+			return RedirectToAction("Index");
+		}
+
+
+		private bool UserExists(string id)
+		{
+			return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
 		}
 	}
 }

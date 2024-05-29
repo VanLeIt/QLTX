@@ -7,6 +7,7 @@ public class Customer
 	[Key]
 	public int Id { get; set; }
 	public string Name { get; set; }
+	public TypeDocument TypeDocument { get; set; }
 	public string IdDocument { get; set; }
 	public string PhoneNumber { get; set; }
 	public string Email { get; set; }
@@ -15,4 +16,15 @@ public class Customer
 	public DateTime CreationTime { get; set; }
 	public string? UpdatedBy { get; set; }
 	public DateTime? UpdationTime { get; set; }
+}
+
+public enum TypeDocument
+{
+	[Display(Name = "Bằng lái xe")]
+	Bang_Lai_Xe,
+	[Display(Name = "Căn cước công dân")]
+	CCCD,
+	[Display(Name = "Hộ chiếu")]
+	Ho_Chieu,
+
 }

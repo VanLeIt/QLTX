@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QLTX.Data;
 using QLTX.Models;
@@ -47,22 +50,65 @@ public class CustomerController : Controller
 	// GET: Customer/Create
 	public IActionResult Create()
 	{
+		var statusList = Enum.GetValues(typeof(TypeDocument))
+						 .Cast<TypeDocument>()
+						 .Select(e => new SelectListItem
+						 {
+							 Value = ((int)e).ToString(),
+							 Text = GetEnumDisplayName(e)
+						 }).ToList();
+
+		ViewData["StatusList"] = new SelectList(statusList, "Value", "Text");
 		return View();
+	}
+
+	//private string GetEnumDisplayName(Enum enumValue)
+	//{
+	//	var displayAttribute = enumValue.GetType()
+	//									.GetMember(enumValue.ToString())
+	//									.First()
+	//									.GetCustomAttribute<DisplayAttribute>();
+	//	return displayAttribute != null ? displayAttribute.Name : enumValue.ToString();
+	//}
+	private string GetEnumDisplayName(Enum enumValue)
+	{
+		var displayAttribute = enumValue.GetType()
+										.GetMember(enumValue.ToString())
+										.First()
+										.GetCustomAttribute<DisplayAttribute>();
+		return displayAttribute != null ? displayAttribute.Name : enumValue.ToString();
 	}
 
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
-	public async Task<IActionResult> Create([Bind("Id,Name,IdDocument , PhoneNumber, Email,  Address ")] Customer customer)
+	public async Task<IActionResult> Create([Bind("Id,Name,TypeDocument,IdDocument , PhoneNumber, Email,  Address ")] Customer customer)
 	{
-		if (CustomerExists(customer.Name))
-		{
+		//if (CustomerExists(customer.Name))
+		//{
 
-			ModelState.AddModelError("Name", "Tên hãng xe đã tồn tại.");
-			return View(customer);
-		}
+		//	ModelState.AddModelError("Name", "Tên hãng xe đã tồn tại.");
+		//	return View(customer);
+		//}
+		//var statusList = Enum.GetValues(typeof(TypeDocument))
+		//				 .Cast<TypeDocument>()
+		//				 .Select(e => new SelectListItem
+		//				 {
+		//					 Value = ((int)e).ToString(),
+		//					 Text = GetEnumDisplayName(e)
+		//				 });
+		//ViewData["StatusList"] = new SelectList(statusList, "Value", "Text", (int)customer.TypeDocument);
 		if (!ModelState.IsValid)
 		{
+			var statusList = Enum.GetValues(typeof(TypeDocument))
+							 .Cast<TypeDocument>()
+							 .Select(e => new SelectListItem
+							 {
+								 Value = ((int)e).ToString(),
+								 Text = GetEnumDisplayName(e)
+							 }).ToList();
+
+			ViewData["StatusList"] = new SelectList(statusList, "Value", "Text");
 			customer.CreatedBy = User.Identity.Name;
 			customer.CreationTime = DateTime.Now;
 			customer.UpdatedBy = null;

@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLTX.Data;
 using QLTX.Models;
 
 namespace QLTX.Controllers
 {
-	public class RoleController : Controller
+    [Authorize(Roles = "admin")]
+    public class RoleController : Controller
 	{
 		private readonly QLTXDbContext _context;
 
@@ -144,7 +146,7 @@ namespace QLTX.Controllers
 		}
 
 
-		public JsonResult Delete(int id)
+		public JsonResult Delete(string id)
 		{
 			bool result = false;
 

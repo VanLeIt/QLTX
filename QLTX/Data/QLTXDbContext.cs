@@ -114,3 +114,4 @@ public class QLTXDbContext : IdentityDbContext<User, Role, string,
 			.HasKey(login => new { login.LoginProvider, login.ProviderKey });
 	}
 }
+

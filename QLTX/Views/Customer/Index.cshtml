@@ -1,4 +1,4 @@
-﻿@model IEnumerable<QLTX.Models.User>
+﻿@model IEnumerable<QLTX.Models.Customer>
 
 @{
 	ViewData["Title"] = "Index";
@@ -25,7 +25,7 @@
 		<div class="card mb-4">
 			<div class="card-header">
 				<i class="fas fa-table me-1"></i>
-				Danh sách người dùng
+				Danh sách xe cho thuê
 			</div>
 			<div class="card-body table-responsive">
 				<table id="datatablesSimple" class="table table-striped" style="width:100%">
@@ -35,17 +35,16 @@
 								STT
 							</th>
 							<th>
-								Email / Tên đăng nhập
+								Họ tên
 							</th>
 							<th>
-								Tên đầy đủ
+								Số giấy tờ cá nhân
 							</th>
-							 
+							<th>
+								Email
+							</th>
 							<th>
 								Số điện thoại
-							</th>
-							<th>
-								Quyền
 							</th>
 							<th>
 								Tạo bởi
@@ -64,23 +63,18 @@
 									<td>
 										@((++index))
 									</td>
-									<td style="text-align:center;">
-										<a asp-action="Details" style="text-decoration: none; color: black" asp-route-id="@item.Id">@item.UserName</a>
+									<td>
 
-									</td>
-									<td style="text-align:center;">
-										@item.FullName
-									</td>
-									 
-									<td>
-										@item.PhoneNumber
+										<a asp-action="Details" style="text-decoration: none; color: black" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name )</a>
 									</td>
 									<td>
-										@foreach (var userRole in item.UserRoles)
-										{
-											@userRole.Role.Name
-											 
-										}
+										@Html.DisplayFor(modelItem => item.IdDocument)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.Email)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.PhoneNumber)
 									</td>
 									<td style="text-align:center;">
 										<div>
@@ -95,10 +89,10 @@
 										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="  margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
 										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
 
-										<a onclick="Confirm('@item.Id')" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
+										<a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
 											<i class="fas fa-trash-alt fa-lg"></i>
 										</a>
-										<a asp-action="EditRoles" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Gán quyền"></i></a>
+
 
 									</td>
 								</tr>
@@ -124,7 +118,7 @@
 				Bạn có chắc muốn xóa mục này !
 			</div>
 			<div class="modal-footer">
-				<form id="deleteForm" asp-action="Delete" asp-controller="User"  method="post">
+				<form id="deleteForm" method="post">
 					<input type="hidden" id="deleteItemId" />
 					<button type="submit" class="btn btn-danger">Xác nhận</button>
 				</form>
@@ -135,6 +129,7 @@
 		</div>
 	</div>
 </div>
+
 
 
 
@@ -150,28 +145,40 @@
 			}
 		}, 3000);
 
+
 		function Confirm(id) {
+
 			document.getElementById('deleteItemId').value = id;
 		}
+
 
 		document.getElementById('deleteForm').addEventListener('submit', function (event) {
 			event.preventDefault();
 			var id = document.getElementById('deleteItemId').value;
 
 			$.ajax({
-				url: '/User/Delete/' + id,
+				url: '/Customer/Delete/' + id,
 				type: 'POST',
 				success: function (response) {
 					if (response) {
+
 						window.location.reload();
 					} else {
+
 						alert('Đã xảy ra lỗi khi xóa mục này.');
 					}
 				},
 				error: function () {
+
 					alert('Đã xảy ra lỗi khi gửi yêu cầu xóa.');
 				}
 			});
 		});
+
+
+
+
 	</script>
+
+
 }

@@ -148,42 +148,7 @@ namespace QLTX.Controllers
             return View(company);
         }
 
-        // GET: Company/Delete/5
-
-
-        // POST: Company/Delete/5
-        /*[HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Company == null)
-            {
-				return NotFound();
-			}
-            var company = await _context.Company.FindAsync(id);
-            if (company != null)
-            {
-                _context.Company.Remove(company);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }*/
-      /*  [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var company = await _context.Company.FindAsync(id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-
-            _context.Company.Remove(company);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
-        }*/
+ 
 
         public JsonResult Delete(int id)
         {

@@ -26,12 +26,19 @@ public class Rental
 }
 public enum RentalService
 {
-	Hour = 0,
-	Day = 1,
+	[Display(Name = "Giờ")]
+	Hour = 1 ,
+	[Display(Name = "Ngày")]
+	Day = 2,
+	[Display(Name = "Tuần")]
+	Week = 3
 }
 public enum RentalStatus
 {
-	Renting=0,
+	[Display(Name = "Đang thuê")]
+	Renting =0,
+	[Display(Name = "Hoàn thành")]
 	Success =1,
-	Cancel=2
+	[Display(Name = "Hủy")]
+	Cancel =2
 }

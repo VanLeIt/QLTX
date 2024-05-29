@@ -39,34 +39,34 @@ public class AccountController : Controller
         return View();
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Register(RegisterVM model)
-    {
-        if (ModelState.IsValid)
-        {
-            User user = new()
-            {
-                FullName = model.FullName,
-                UserName = model.Email,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                Address = model.Address,
+    //[HttpPost]
+    //public async Task<IActionResult> Register(RegisterVM model)
+    //{
+    //    if (ModelState.IsValid)
+    //    {
+    //        User user = new()
+    //        {
+    //            FullName = model.FullName,
+    //            UserName = model.Email,
+    //            Email = model.Email,
+    //            PhoneNumber = model.PhoneNumber,
+    //            Address = model.Address,
 
 
-            };
-            var result = await _userManager.CreateAsync(user, model.Password!);
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, false);
-                return RedirectToAction("Index", "Home");
-            }
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error.Description);
-            }
-        }
-        return View(model);
-    }
+    //        };
+    //        var result = await _userManager.CreateAsync(user, model.Password!);
+    //        if (result.Succeeded)
+    //        {
+    //            await _signInManager.SignInAsync(user, false);
+    //            return RedirectToAction("Index", "Home");
+    //        }
+    //        foreach (var error in result.Errors)
+    //        {
+    //            ModelState.AddModelError("", error.Description);
+    //        }
+    //    }
+    //    return View(model);
+    //}
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
