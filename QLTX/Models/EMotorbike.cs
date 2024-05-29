@@ -13,7 +13,7 @@ namespace QLTX.Models
 		public string License { get; set; }
 		public string? Description { get; set; }
         public EMotorbikeStatus Status { get; set; } = EMotorbikeStatus.Ready;
-        
+        public string? ImageUrl { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreationTime { get; set; }
         public string? UpdatedBy { get; set;}

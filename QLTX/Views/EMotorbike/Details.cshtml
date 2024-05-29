@@ -15,66 +15,85 @@
             <li class="breadcrumb-item active">Loại xe</li>
         </ol>
         <hr />
-        <dl class="row">
-            <dt class="col-sm-2">
-                Tên loại xe
-            </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.TypeMotorbike.Name)
-                </dd>
-            <dt class="col-sm-2">
-                Biển số xe
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.License)
-            </dd>
-            <dt class="col-sm-2">
-                Số khung
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.VinNumber)
-            </dd>
-            
-                <dt class="col-sm-2">
-                    Trạng thái
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        Tên loại xe
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.TypeMotorbike.Name)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Biển số xe
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.License)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Số khung
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.VinNumber)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Trạng thái
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Status)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Mô tả
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Description)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Người tạo
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.CreatedBy)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Thời gian tạo
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Model.CreationTime.ToString("dd/MM/yyyy HH:mm")
+                    </dd>
+                    @if (!string.IsNullOrEmpty(Model.UpdatedBy))
+                    {
+                        <dt class="col-sm-4">
+                            Người sửa cuối
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.UpdatedBy)
+                        </dd>
+                        <dt class="col-sm-4">
+                            Thời gian sửa
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Model.UpdationTime?.ToString("dd/MM/yyyy HH:mm")
+                        </dd>
+                    }
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dt class="col-sm-12">
+                    Hình ảnh
                 </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.Status)
+                <dd class="col-sm-12">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="Motorbike Image" style="max-width: 200px; height: auto;" />
+                    }
+                    else
+                    {
+                        <img src="/assets/img/no-image-100.png" alt="Motorbike Image" style="max-width: 200px; height: auto;" />
+                    }
                 </dd>
-            <dt class="col-sm-2">
-                Mô tả
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Description)
-            </dd>
-            <dt class="col-sm-2">
-                Người tạo
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.CreatedBy)
-            </dd>
-            <dt class="col-sm-2">
-                Thời gian tạo
-            </dt>
-            <dd class="col-sm-10">
-                @Model.CreationTime.ToString("dd/MM/yyyy HH:mm")
-            </dd>
-            @if (!string.IsNullOrEmpty(Model.UpdatedBy))
-            {
-                <dt class="col-sm-2">
-                    Người sửa cuối
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.UpdatedBy)
-                </dd>
-                <dt class="col-sm-2">
-                    Thời gian sửa
-                </dt>
-                <dd class="col-sm-10">
-                    @Model.UpdationTime?.ToString("dd/MM/yyyy HH:mm")
-                </dd>
-            }
-        </dl>
+            </div>
+        </div>
+        
         <div class="row">
             <div class="col-sm-2">
                 <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Cập nhật</a>

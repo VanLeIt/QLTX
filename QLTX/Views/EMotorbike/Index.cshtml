@@ -35,6 +35,9 @@
 								STT
 							</th>
 							<th>
+								Ảnh
+							</th>
+							<th>
 								Biển số xe
 							</th>
 							<th>
@@ -62,6 +65,16 @@
 								<tr>
 									<td>
 										@((++index))
+									</td>
+									<td class="text-center"> 
+										@if (!string.IsNullOrEmpty(item.ImageUrl))
+										{
+											<img src="@item.ImageUrl" alt="Motorbike Image" style="max-width: 70px; height: auto;" />
+										}
+										else
+										{
+											<img src="/assets/img/no-image-50.png" alt="Motorbike Image" style="max-width: 70px; height: auto;" />
+										}
 									</td>
 									<td>
 
