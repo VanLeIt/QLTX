@@ -20,12 +20,12 @@ public class EMotorbikeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        if (TempData.ContainsKey("SuccessMessage"))
+        if (TempData.ContainsKey("SuccessMessage")) 
         {
             ViewBag.SuccessMessage = TempData["SuccessMessage"];
         }
         return _context.EMotorbikes != null ?
-                      View(await _context.EMotorbikes.Include(t => t.TypeMotorbike).OrderByDescending(m => m.CreationTime).ToListAsync()) :
+                      View(await _context.EMotorbikes.Include(t => t.TypeMotorbike).Where(a=>a.IsDelete == false).OrderByDescending(m => m.CreationTime).ToListAsync()) :
                       Problem("Khong tim thay xe.");
 
     }
@@ -220,17 +220,15 @@ public class EMotorbikeController : Controller
         {
 			if (ImageFile != null && ImageFile.Length > 0)
 			{
-				// Lấy tên file và đường dẫn lưu trữ trên server
+				 
 				var fileName = Path.GetFileName(ImageFile.FileName);
 				var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
-
-				// Lưu ảnh vào thư mục trên server
+                  
 				using (var stream = new FileStream(filePath, FileMode.Create))
 				{
 					await ImageFile.CopyToAsync(stream);
 				}
-
-				// Cập nhật URL của ảnh trong đối tượng eMotorbikes
+                 
 				eMotorbikes.ImageUrl = $"/images/{fileName}";
 			}
 			else
@@ -292,8 +290,9 @@ public class EMotorbikeController : Controller
                     System.IO.File.Delete(filePath);
                 }
             }
-            _context.EMotorbikes.Remove(eMotorbikes);
-            _context.SaveChanges();
+			eMotorbikes.IsDelete = true;    
+			//_context.EMotorbikes.Remove(eMotorbikes);
+			_context.SaveChanges();
             TempData["SuccessMessage"] = "Đã xóa thành công.";
             result = true;
         }

@@ -15,6 +15,6 @@ public class Bill
 	public DateTime CreationTime { get; set; }
 	public string? UpdatedBy { get; set; }
 	public DateTime? UpdationTime { get; set; }
-
+    public bool IsDelete { get; set; }
 
 }

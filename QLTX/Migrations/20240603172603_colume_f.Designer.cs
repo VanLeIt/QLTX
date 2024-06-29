@@ -12,8 +12,8 @@ using QLTX.Data;
 namespace QLTX.Migrations
 {
     [DbContext(typeof(QLTXDbContext))]
-    [Migration("20240520172145_emun_typeDocument")]
-    partial class emun_typeDocument
+    [Migration("20240603172603_colume_f")]
+    partial class colume_f
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -267,6 +267,9 @@ namespace QLTX.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("License")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -364,9 +367,14 @@ namespace QLTX.Migrations
                     b.Property<int>("RentalId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RentalId1")
+                        .HasColumnType("int");
+
                     b.HasKey("EMotorbileId", "RentalId");
 
                     b.HasIndex("RentalId");
+
+                    b.HasIndex("RentalId1");
 
                     b.ToTable("RentalDetails");
                 });
@@ -655,6 +663,10 @@ namespace QLTX.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("QLTX.Models.Rental", null)
+                        .WithMany("RentlDetails")
+                        .HasForeignKey("RentalId1");
+
                     b.Navigation("EMotorbike");
 
                     b.Navigation("Rental");
@@ -693,6 +705,11 @@ namespace QLTX.Migrations
             modelBuilder.Entity("QLTX.Models.Company", b =>
                 {
                     b.Navigation("TypeMotorbikes");
+                });
+
+            modelBuilder.Entity("QLTX.Models.Rental", b =>
+                {
+                    b.Navigation("RentlDetails");
                 });
 
             modelBuilder.Entity("QLTX.Models.Role", b =>

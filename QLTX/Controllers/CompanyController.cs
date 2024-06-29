@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QLTX.Data;
 using QLTX.Models;
 
 namespace QLTX.Controllers
 {
-    [Authorize]
+	[Authorize]
     public class CompanyController : Controller
     {
         private readonly QLTXDbContext _context;
@@ -29,7 +24,7 @@ namespace QLTX.Controllers
                 ViewBag.SuccessMessage = TempData["SuccessMessage"];
             }
             return _context.Companies != null ? 
-                          View(await _context.Companies.ToListAsync()) :
+                          View(await _context.Companies.Where(a=>a.IsDelete == false).ToListAsync()) :
                           Problem("Entity set 'QLTXDbContext.Company'  is null.");
         }
 
@@ -72,6 +67,7 @@ namespace QLTX.Controllers
             {
 			company.CreatedBy = User.Identity.Name;
             company.CreationTime = DateTime.Now;
+            company.IsDelete = false;
             company.UpdatedBy = null;
             company.UpdationTime = null;
            
@@ -158,7 +154,8 @@ namespace QLTX.Controllers
             if (company != null)
             {
                 result = true;
-                _context.Companies.Remove(company);
+                //_context.Companies.Remove(company);
+                company.IsDelete = true;
                 _context.SaveChanges();
 				TempData["SuccessMessage"] = "Đã xóa thành công.";
 			}

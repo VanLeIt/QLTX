@@ -17,8 +17,12 @@ public class CreateRental
 	public DateTime DateRetalTo { get; set; }
 	public DateTime RetalTime { get; set; }
 	public RentalService Service { get; set; }
-	public double Price { get; set; }
+	public double Price { get; set; } 
+	public IList<int> EmotorIds { get; set; }
 	public RentalStatus Status { get; set; } = RentalStatus.Renting;
 	public double Total { get; set; }
 	public string Note { get; set; }
+	 
+
 }
+

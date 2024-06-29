@@ -24,8 +24,8 @@ namespace QLTX.Controllers
 				ViewBag.SuccessMessage = TempData["SuccessMessage"];
 			}
 			return _context.Roles != null ?
-						  View(await _context.Roles.ToListAsync()) :
-						  Problem("Entity set 'QLTXDbContext.Role'  is null.");
+						  View(await _context.Roles.Where(a=>a.IsDelete == false).ToListAsync()) :
+						  Problem("Không có bản ghi nào.");
 		}
 
 		// GET: Role/Details/5
@@ -154,7 +154,8 @@ namespace QLTX.Controllers
 			if (role != null)
 			{
 				result = true;
-				_context.Roles.Remove(role);
+				//_context.Roles.Remove(role);
+				role.IsDelete = true;
 				_context.SaveChanges();
 				TempData["SuccessMessage"] = "Đã xóa thành công.";
 			}

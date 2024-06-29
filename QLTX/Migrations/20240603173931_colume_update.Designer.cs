@@ -12,8 +12,8 @@ using QLTX.Data;
 namespace QLTX.Migrations
 {
     [DbContext(typeof(QLTXDbContext))]
-    [Migration("20240514171431_update_user_role")]
-    partial class update_user_role
+    [Migration("20240603173931_colume_update")]
+    partial class colume_update
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,7 +47,7 @@ namespace QLTX.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("RoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -72,7 +72,7 @@ namespace QLTX.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("UserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -94,7 +94,7 @@ namespace QLTX.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("UserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -113,7 +113,7 @@ namespace QLTX.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("UserTokens", (string)null);
                 });
 
             modelBuilder.Entity("QLTX.Models.Bill", b =>
@@ -235,6 +235,9 @@ namespace QLTX.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TypeDocument")
+                        .HasColumnType("int");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -262,6 +265,9 @@ namespace QLTX.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("License")
@@ -361,9 +367,14 @@ namespace QLTX.Migrations
                     b.Property<int>("RentalId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RentalId1")
+                        .HasColumnType("int");
+
                     b.HasKey("EMotorbileId", "RentalId");
 
                     b.HasIndex("RentalId");
+
+                    b.HasIndex("RentalId1");
 
                     b.ToTable("RentalDetails");
                 });
@@ -378,14 +389,12 @@ namespace QLTX.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -409,7 +418,7 @@ namespace QLTX.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("QLTX.Models.TypeMotorbike", b =>
@@ -479,7 +488,6 @@ namespace QLTX.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreationTime")
@@ -546,7 +554,7 @@ namespace QLTX.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("QLTX.Models.UserRoles", b =>
@@ -561,7 +569,7 @@ namespace QLTX.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -655,6 +663,10 @@ namespace QLTX.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("QLTX.Models.Rental", null)
+                        .WithMany("RentlDetails")
+                        .HasForeignKey("RentalId1");
+
                     b.Navigation("EMotorbike");
 
                     b.Navigation("Rental");
@@ -693,6 +705,11 @@ namespace QLTX.Migrations
             modelBuilder.Entity("QLTX.Models.Company", b =>
                 {
                     b.Navigation("TypeMotorbikes");
+                });
+
+            modelBuilder.Entity("QLTX.Models.Rental", b =>
+                {
+                    b.Navigation("RentlDetails");
                 });
 
             modelBuilder.Entity("QLTX.Models.Role", b =>

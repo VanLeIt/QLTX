@@ -1,8 +1,12 @@
-﻿namespace QLTX.ViewModels
+﻿namespace QLTX.ViewModels;
+
+public class UserRolesDto
 {
-	public class UserRolesDto
+	public string UserId { get; set; }
+	public List<string> RoleIds { get; set; }
+
+	public UserRolesDto()
 	{
-		public string UserId { get; set; }
-		public List<string> RoleIds { get; set; }
+		RoleIds = new List<string>();
 	}
 }

@@ -18,6 +18,7 @@ public class TypeMotorbike
 	public DateTime CreationTime { get; set; }
 	public string? UpdatedBy { get; set; }
 	public DateTime? UpdationTime { get; set; }
-	public List<EMotorbike> EMotorbikes { get; set; }
+    public bool IsDelete { get; set; }
+    public List<EMotorbike> EMotorbikes { get; set; }
 
 }

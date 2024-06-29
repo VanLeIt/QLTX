@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QLTX.Data;
 using QLTX.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace QLTX.Controllers;
 
@@ -25,7 +26,7 @@ public class CustomerController : Controller
 			ViewBag.SuccessMessage = TempData["SuccessMessage"];
 		}
 		return _context.Customers != null ?
-					  View(await _context.Customers.ToListAsync()) :
+					  View(await _context.Customers.Where(a => a.IsDelete == false).ToListAsync()) :
 					  Problem("Entity set 'QLTXDbContext.Customer'  is null.");
 	}
 
@@ -196,7 +197,9 @@ public class CustomerController : Controller
 		if (customer != null)
 		{
 			result = true;
-			_context.Customers.Remove(customer);
+			//_context.Customers.Remove(customer);
+			//_context.SaveChanges();
+			customer.IsDelete = true;
 			_context.SaveChanges();
 			TempData["SuccessMessage"] = "Đã xóa thành công.";
 		}

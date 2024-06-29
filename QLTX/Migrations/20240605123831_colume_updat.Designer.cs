@@ -12,8 +12,8 @@ using QLTX.Data;
 namespace QLTX.Migrations
 {
     [DbContext(typeof(QLTXDbContext))]
-    [Migration("20240529144722_colume_file")]
-    partial class colume_file
+    [Migration("20240605123831_colume_updat")]
+    partial class colume_updat
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -138,6 +138,9 @@ namespace QLTX.Migrations
                     b.Property<DateTime>("DatePay")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
                     b.Property<int>("RentalId")
                         .HasColumnType("int");
 
@@ -185,6 +188,9 @@ namespace QLTX.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -227,6 +233,9 @@ namespace QLTX.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -267,11 +276,11 @@ namespace QLTX.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.Property<string>("License")
                         .IsRequired()
@@ -324,6 +333,9 @@ namespace QLTX.Migrations
                     b.Property<DateTime>("DateRetalTo")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Note")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -370,9 +382,14 @@ namespace QLTX.Migrations
                     b.Property<int>("RentalId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RentalId1")
+                        .HasColumnType("int");
+
                     b.HasKey("EMotorbileId", "RentalId");
 
                     b.HasIndex("RentalId");
+
+                    b.HasIndex("RentalId1");
 
                     b.ToTable("RentalDetails");
                 });
@@ -394,6 +411,9 @@ namespace QLTX.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
@@ -445,6 +465,9 @@ namespace QLTX.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -502,6 +525,9 @@ namespace QLTX.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -661,6 +687,10 @@ namespace QLTX.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("QLTX.Models.Rental", null)
+                        .WithMany("RentlDetails")
+                        .HasForeignKey("RentalId1");
+
                     b.Navigation("EMotorbike");
 
                     b.Navigation("Rental");
@@ -699,6 +729,11 @@ namespace QLTX.Migrations
             modelBuilder.Entity("QLTX.Models.Company", b =>
                 {
                     b.Navigation("TypeMotorbikes");
+                });
+
+            modelBuilder.Entity("QLTX.Models.Rental", b =>
+                {
+                    b.Navigation("RentlDetails");
                 });
 
             modelBuilder.Entity("QLTX.Models.Role", b =>

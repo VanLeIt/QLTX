@@ -16,13 +16,14 @@ public class Rental
 	public RentalService Service {  get; set; }
 	public double Price {  get; set; }
 	public RentalStatus Status { get; set; } = RentalStatus.Renting;
+	public ICollection<RentalDetail> RentlDetails { get; set; } = new List<RentalDetail>();
 	public double Total { get; set; }
 	public string Note { get; set; }
 	public string CreatedBy { get; set; }
 	public DateTime CreationTime { get; set; }
 	public string? UpdatedBy { get; set; }
 	public DateTime? UpdationTime { get; set; }
-
+    public bool IsDelete { get; set; }
 }
 public enum RentalService
 {

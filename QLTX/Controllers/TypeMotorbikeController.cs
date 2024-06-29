@@ -23,8 +23,8 @@ public class TypeMotorbikeController : Controller
 			ViewBag.SuccessMessage = TempData["SuccessMessage"];
 		}
 		return _context.TypeMotorbikes != null ?
-					  View(await _context.TypeMotorbikes.Include(t=> t.Company).ToListAsync()) :
-					  Problem("Khong tim thay loại xe.");
+					  View(await _context.TypeMotorbikes.Include(t=> t.Company).Where(a=>a.IsDelete ==false).ToListAsync()) :
+					  Problem("Không tìm thấy bản ghi.");
 		 
 	}
 
@@ -148,7 +148,6 @@ public class TypeMotorbikeController : Controller
 		}
 		return View(typeMotorbikes);
 	}
-
 	 
 
 	public JsonResult Delete(int id)
@@ -159,7 +158,8 @@ public class TypeMotorbikeController : Controller
 		if (typeMotorbikes != null)
 		{
 			result = true;
-			_context.TypeMotorbikes.Remove(typeMotorbikes);
+			typeMotorbikes.IsDelete = true;
+			//_context.TypeMotorbikes.Remove(typeMotorbikes);
 			_context.SaveChanges();
 			TempData["SuccessMessage"] = "Đã xóa thành công.";
 		}

@@ -1,35 +1,56 @@
 ﻿@model QLTX.ViewModels.UserRoleViewModel
 
 @{
-    ViewData["Title"] = "EditRoles";
+	ViewData["Title"] = "EditRoles";
 }
 
-<h2>Edit User Roles for @Model.UserName</h2>
-
-<form asp-action="EditRoles" method="post">
-    <div>
-        <input type="hidden" asp-for="UserId" />
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Role</th>
-                    <th>Assigned</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < Model.AvailableRoles.Count; i++)
-                {
-                    var role = Model.AvailableRoles[i];
-                    <tr>
-                        <td>@role.Text</td>
-                        <td>
-                            <input type="checkbox" name="SelectedRoles" value="@role.Value"
-                            @(Model.SelectedRoles.Contains(role.Value) ? "checked" : "") />
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+<main>
+	<div class="container-fluid px-4">
+		<h2 class="mt-4">Gán quyền</h2>
+		<ol class="breadcrumb mb-4">
+			<li class="breadcrumb-item active">Người dùng @Model.UserName</li>
+		</ol> 
+		<hr />
+		<div class="row">
+			<div class="col-md-4">
+				<form asp-action="EditRoles" method="post">
+					<div>
+						<input type="hidden" asp-for="UserId" />
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Quyền</th>
+									<th>Chọn</th>
+								</tr>
+							</thead>
+							<tbody>
+								@for (int i = 0; i < Model.AvailableRoles.Count; i++)
+								{
+									var role = Model.AvailableRoles[i];
+									<tr>
+										<td>@role.Text</td>
+										<td>
+											<input type="checkbox" name="SelectedRoles" value="@role.Value"
+											@(Model.SelectedRoles.Contains(role.Value) ? "checked" : "") />
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+					<div class="form-group d-flex justify-content-between align-items-center">
+						<a asp-action="Index" class="btn btn-secondary">Đóng</a>
+						<button type="submit" class="btn btn-primary">
+							<i class="fas fa-save"></i> Lưu
+						</button> 
+					</div> 
+				</form>
+			</div>
+		</div> 
+	</div>
+</main>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

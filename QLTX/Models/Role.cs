@@ -10,5 +10,6 @@ public class Role : IdentityRole
 	public DateTime CreationTime { get; set; }
 	public string? UpdatedBy { get; set; }
 	public DateTime? UpdationTime { get; set; }
-	public virtual ICollection<UserRoles> UserRoles { get; set; }
+    public bool IsDelete { get; set; }
+    public virtual ICollection<UserRoles>? UserRoles { get; set; }
 }

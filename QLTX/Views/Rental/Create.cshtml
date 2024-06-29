@@ -1,70 +1,197 @@
-﻿@* @model QLTX.Models.Rental
+﻿@model QLTX.ViewModels.CreateRental
 
 @{
-	ViewData["Title"] = "Create";
+	ViewData["Title"] = "Create Rental";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <main>
 	<div class="container-fluid px-4">
-		<h2 class="mt-4">Thêm mới</h2>
+		<h2 class="mt-4">Thêm mới đơn thuê</h2>
 		<ol class="breadcrumb mb-4">
 			<li class="breadcrumb-item active">Đơn thuê xe</li>
 		</ol>
 
 		<hr />
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-8">
 				<form asp-action="Create">
 					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
 					<div class="mb-3">
-						<label asp-for="License" class="control-label">Biển số xe</label>
-						<input asp-for="License" class="form-control" />
-						<span asp-validation-for="License" class="text-danger"></span>
+						<label asp-for="Name" class="control-label">Tên khách hàng</label>
+						<input asp-for="Name" class="form-control" />
+						<span asp-validation-for="Name" class="text-danger"></span>
 					</div>
+
 					<div class="mb-3">
-						<label asp-for="TypeMotorbikeId" class="control-label mb-2">Loại xe</label>
-						<select asp-for="TypeMotorbikeId" class="form-control" asp-items="ViewBag.TypeMotorbikeId">
+						<label asp-for="IdDocument" class="control-label">Số giấy tờ</label>
+						<input asp-for="IdDocument" class="form-control" />
+						<span asp-validation-for="IdDocument" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="PhoneNumber" class="control-label">Số điện thoại</label>
+						<input asp-for="PhoneNumber" class="form-control" />
+						<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Email" class="control-label">Email</label>
+						<input asp-for="Email" class="form-control" />
+						<span asp-validation-for="Email" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Address" class="control-label">Địa chỉ</label>
+						<input asp-for="Address" class="form-control" />
+						<span asp-validation-for="Address" class="text-danger"></span>
+					</div>
+
+					@*  <div class="mb-3">
+					<label asp-for="DateRetalFrom" class="control-label">Ngày bắt đầu thuê</label>
+					<input asp-for="DateRetalFrom" class="form-control" />
+					<span asp-validation-for="DateRetalFrom" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+					<label asp-for="DateRetalTo" class="control-label">Ngày kết thúc thuê</label>
+					<input asp-for="DateRetalTo" class="form-control" />
+					<span asp-validation-for="DateRetalTo" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+					<label asp-for="RetalTime" class="control-label">Thời gian thuê</label>
+					<input asp-for="RetalTime" class="form-control" />
+					<span asp-validation-for="RetalTime" class="text-danger"></span>
+					</div> *@
+					<div class="mb-3">
+						<label asp-for="DateRetalFrom" class="control-label">Ngày bắt đầu thuê</label>
+						<input asp-for="DateRetalFrom" class="form-control" id="DateRetalFrom" type="date" />
+						<span asp-validation-for="DateRetalFrom" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="DateRetalTo" class="control-label">Ngày kết thúc thuê</label>
+						<input asp-for="DateRetalTo" class="form-control" id="DateRetalTo" type="date" />
+						<span asp-validation-for="DateRetalTo" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="RetalTime" class="control-label">Thời gian thuê</label>
+						<input asp-for="RetalTime" class="form-control" id="RetalTime" type="text" readonly />
+						<span asp-validation-for="RetalTime" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Service" class="control-label">Dịch vụ thuê</label>
+						<select asp-for="Service" class="form-control" id="Service">
+							<option value="1">Giờ</option>
+							<option value="2">Ngày</option>
+							<option value="3">Tuần</option>
 						</select>
-						<span asp-validation-for="TypeMotorbikeId" class="text-danger"></span>
+						<span asp-validation-for="Service" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Price" class="control-label">Giá</label>
+						<input asp-for="Price" class="form-control" />
+						<span asp-validation-for="Price" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="EmotorIds" class="control-label">Chọn xe</label>
+						<input asp-for="EmotorIds" class="form-control" />
+						<span asp-validation-for="EmotorIds" class="text-danger"></span>
 					</div>
 					@* <div class="mb-3">
-					<label asp-for="Status" class="control-label mb-2">Trạng thái</label>
-					<select asp-for="Status" class="form-control" asp-items="@ViewBag.StatusList">
+						<label asp-for="EmotorIds" class="control-label">Chọn xe</label>
+						<select asp-for="EmotorIds" class="form-control" id="EmotorIds">
+							<option value="1">Xe 1</option>
+							<option value="2">Xe 2</option>
+							<option value="3">Xe 3</option>
+							<option value="4">Xe 4</option>
+							<!-- Add more options as needed -->
+						</select>
+						<span asp-validation-for="EmotorIds" class="text-danger"></span>
+					</div> *@
+					<div class="mb-3">
+						<label asp-for="EmotorIds" class="control-label">Chọn xe</label>
+						<select class="form-select" aria-label="Default select example">
+						<option selected>Open this select menu</option>
+						<option value="1">One</option>
+						<option value="2">Two</option>
+						<option value="3">Three</option>
 					</select>
-					<span asp-validation-for="Status" class="text-danger"></span>
-					</div> 
-					<div class="mb-3">
-						<label asp-for="VinNumber" class="control-label mb-2">Số khung</label>
-						<input asp-for="VinNumber" class="form-control" />
-						<span asp-validation-for="VinNumber" class="text-danger"></span>
+						<span asp-validation-for="EmotorIds" class="text-danger"></span>
 					</div>
 
 					<div class="mb-3">
-						<label asp-for="Description" class="control-label mb-2">Mô tả</label>
-						<input asp-for="Description" class="form-control" />
-						<span asp-validation-for="Description" class="text-danger"></span>
+						<label asp-for="Note" class="control-label">Ghi chú</label>
+						<input asp-for="Note" class="form-control" />
+						<span asp-validation-for="Note" class="text-danger"></span>
 					</div>
-
+					</form>
 					<div class="form-group d-flex justify-content-between align-items-center">
 						<a asp-action="Index" class="btn btn-secondary">Đóng</a>
 						<button type="submit" class="btn btn-primary">
 							<i class="fas fa-save"></i> Lưu
 						</button>
-
 					</div>
-				</form>
-			</div>
-		</div>
 
+					@section Scripts {
+						@{
+							await Html.RenderPartialAsync("_ValidationScriptsPartial");
+						}
+						<script>
+							document.addEventListener('DOMContentLoaded', function () {
+								document.getElementById('DateRetalFrom').addEventListener('change', calculateRentalTime);
+								document.getElementById('DateRetalTo').addEventListener('change', calculateRentalTime);
+								document.getElementById('Service').addEventListener('change', calculateRentalTime);
+							});
 
-	</div>
-</main>
-@section Scripts {
-	@{
-		await Html.RenderPartialAsync("_ValidationScriptsPartial");
-	}
-}
+							function calculateRentalTime() {
+								var startDateValue = document.getElementById('DateRetalFrom').value;
+								var endDateValue = document.getElementById('DateRetalTo').value;
+								var serviceType = document.getElementById('Service').value;
 
-*@
+								console.log('Start Date:', startDateValue);
+								console.log('End Date:', endDateValue);
+								console.log('Service Type:', serviceType);
+
+								if (startDateValue && endDateValue) {
+									var startDate = new Date(startDateValue);
+									var endDate = new Date(endDateValue);
+
+									if (startDate <= endDate) {
+										var timeDiff = endDate - startDate;
+
+										var rentalTime;
+										switch (serviceType) {
+											case '1': // Hours
+												var hoursDiff = Math.ceil(timeDiff / (1000 * 60 * 60)); 
+												rentalTime = hoursDiff + " giờ";
+												break;
+											case '2': // Days
+												var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); 
+												rentalTime = daysDiff + " ngày";
+												break;
+											case '3': // Weeks
+												var weeksDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24 * 7)); // Convert time difference to weeks
+												rentalTime = weeksDiff + " tuần";
+												break;
+											default:
+												rentalTime = '';
+										}
+
+										document.getElementById('RetalTime').value = rentalTime;
+									} else {
+										document.getElementById('RetalTime').value = '';
+									}
+								} else {
+									document.getElementById('RetalTime').value = '';
+								}
+							}
+						</script>
+					}
+

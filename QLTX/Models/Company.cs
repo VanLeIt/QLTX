@@ -12,7 +12,7 @@ namespace QLTX.Models
         public DateTime CreationTime { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? UpdationTime { get; set; }
-
-       public List<TypeMotorbike> TypeMotorbikes { get; set; }
+        public bool IsDelete { get; set; }
+        public List<TypeMotorbike> TypeMotorbikes { get; set; }
     }
 }

@@ -10,4 +10,11 @@ public class RentalDetail
 	 
 	public int RentalId { get; set; }
 	public Rental Rental { get; set; }
+     
+
+    //public RentalDetail(int eMotorbileId, int rentalId)
+    //{
+    //	EMotorbileId = eMotorbileId;
+    //	RentalId = rentalId;
+    //}
 }

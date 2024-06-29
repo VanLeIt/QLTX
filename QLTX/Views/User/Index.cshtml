@@ -18,6 +18,12 @@
 				@ViewBag.SuccessMessage
 			</div>
 		}
+		else if (ViewBag.ErrorMessage != null)
+		{
+			<div id="errorMessage" class="alert alert-warning alert-sm text-sm" role="alert">
+				@ViewBag.ErrorMessage
+			</div>
+		}
 		<p>
 			<a asp-action="Create" class="btn btn-primary" id="openCreateModal">Thêm mới </a>
 		</p>
@@ -40,7 +46,7 @@
 							<th>
 								Tên đầy đủ
 							</th>
-							 
+
 							<th>
 								Số điện thoại
 							</th>
@@ -71,16 +77,27 @@
 									<td style="text-align:center;">
 										@item.FullName
 									</td>
-									 
+
 									<td>
 										@item.PhoneNumber
 									</td>
+									@* <td>
+							@foreach (var userRole in item.UserRoles)
+							{
+							@userRole.Role.Name
+
+							}
+							</td> *@
 									<td>
-										@foreach (var userRole in item.UserRoles)
-										{
-											@userRole.Role.Name
-											 
+										@{
+											var roleNames = new List<string>();
+											foreach (var userRole in item.UserRoles)
+											{
+												roleNames.Add(userRole.Role.Name);
+											}
+											var rolesString = string.Join(" / ", roleNames);
 										}
+										@rolesString
 									</td>
 									<td style="text-align:center;">
 										<div>
@@ -92,14 +109,12 @@
 									</td>
 
 									<td class="text-center text-lg-center">
-										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="  margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
-										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
-
-										<a onclick="Confirm('@item.Id')" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
-											<i class="fas fa-trash-alt fa-lg"></i>
-										</a>
-										<a asp-action="EditRoles" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Gán quyền"></i></a>
-
+										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
+										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
+										<a asp-action="EditRoles" asp-route-id="@item.Id" class="text-Success" style="margin-right:5px"><i class="fas fa-key fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Gán quyền"></i></a>
+										<a onclick="Confirm('@item.Id')" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal">
+											<i class="fas fa-trash-alt fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"></i>
+										</a> 
 									</td>
 								</tr>
 							}
@@ -124,13 +139,11 @@
 				Bạn có chắc muốn xóa mục này !
 			</div>
 			<div class="modal-footer">
-				<form id="deleteForm" asp-action="Delete" asp-controller="User"  method="post">
+				<form id="deleteForm" asp-action="Delete" asp-controller="User" method="post">
 					<input type="hidden" id="deleteItemId" />
 					<button type="submit" class="btn btn-danger">Xác nhận</button>
-				</form>
-
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
+				</form> 
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> 
 			</div>
 		</div>
 	</div>
@@ -143,10 +156,14 @@
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
 	<script>
+		 
 		setTimeout(function () {
 			var successMessage = document.getElementById("successMessage");
+			var errorMessage = document.getElementById("errorMessage");
 			if (successMessage) {
 				successMessage.style.display = "none";
+			} else if (errorMessage) {
+				errorMessage.style.display = "none";
 			}
 		}, 3000);
 
