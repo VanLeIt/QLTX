@@ -68,11 +68,11 @@ public class QLTXDbContext : IdentityDbContext<User, Role, string,
 				.WithOne()
 				.HasForeignKey(ut => ut.UserId)
 				.IsRequired();
-			 
+
 			b.HasMany(e => e.UserRoles)
 				.WithOne(e => e.User)
-				.HasForeignKey(ur => ur.UserId)
-				.IsRequired();
+				.HasForeignKey(ur => ur.UserId);
+				/*.IsRequired()*/
 		});
 
 		modelBuilder.Entity<Role>(b =>
