@@ -18,20 +18,25 @@ public class CustomerController : Controller
 		_context = context;
 	}
 
-	// GET: Customer
-	public async Task<IActionResult> Index()
-	{
-		if (TempData.ContainsKey("SuccessMessage"))
-		{
-			ViewBag.SuccessMessage = TempData["SuccessMessage"];
-		}
-		return _context.Customers != null ?
-					  View(await _context.Customers.Where(a => a.IsDelete == false).ToListAsync()) :
-					  Problem("Entity set 'QLTXDbContext.Customer'  is null.");
-	}
+ 
 
-	// GET: Customer/Details/5
-	public async Task<IActionResult> Details(int? id)
+    public async Task<IActionResult> Index()
+    {
+        if (TempData.ContainsKey("SuccessMessage"))
+        {
+            ViewBag.SuccessMessage = TempData["SuccessMessage"];
+        }
+        else
+        {
+            ViewBag.SuccessMessage = TempData["ErrorMessage"];
+        }
+        return _context.Customers != null ?
+                      View(await _context.Customers.Where(a => a.IsDelete == false).ToListAsync()) :
+                      Problem("Không có bản ghi nào.");
+    }
+
+    // GET: Customer/Details/5
+    public async Task<IActionResult> Details(int? id)
 	{
 		if (id == null || _context.Customers == null)
 		{
@@ -63,14 +68,7 @@ public class CustomerController : Controller
 		return View();
 	}
 
-	//private string GetEnumDisplayName(Enum enumValue)
-	//{
-	//	var displayAttribute = enumValue.GetType()
-	//									.GetMember(enumValue.ToString())
-	//									.First()
-	//									.GetCustomAttribute<DisplayAttribute>();
-	//	return displayAttribute != null ? displayAttribute.Name : enumValue.ToString();
-	//}
+ 
 	private string GetEnumDisplayName(Enum enumValue)
 	{
 		var displayAttribute = enumValue.GetType()
@@ -85,20 +83,7 @@ public class CustomerController : Controller
 	[ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([Bind("Id,Name,TypeDocument,IdDocument , PhoneNumber, Email,  Address ")] Customer customer)
 	{
-		//if (CustomerExists(customer.Name))
-		//{
-
-		//	ModelState.AddModelError("Name", "Tên hãng xe đã tồn tại.");
-		//	return View(customer);
-		//}
-		//var statusList = Enum.GetValues(typeof(TypeDocument))
-		//				 .Cast<TypeDocument>()
-		//				 .Select(e => new SelectListItem
-		//				 {
-		//					 Value = ((int)e).ToString(),
-		//					 Text = GetEnumDisplayName(e)
-		//				 });
-		//ViewData["StatusList"] = new SelectList(statusList, "Value", "Text", (int)customer.TypeDocument);
+		 
 		if (!ModelState.IsValid)
 		{
 			var statusList = Enum.GetValues(typeof(TypeDocument))
@@ -141,7 +126,17 @@ public class CustomerController : Controller
 		{
 			return NotFound();
 		}
-		return View(customer);
+
+        var statusList = Enum.GetValues(typeof(TypeDocument))
+                         .Cast<TypeDocument>()
+                         .Select(e => new SelectListItem
+                         {
+                             Value = ((int)e).ToString(),
+                             Text = GetEnumDisplayName(e)
+                         }).ToList();
+
+        ViewData["StatusList"] = new SelectList(statusList, "Value", "Text");
+        return View(customer);
 	}
 
 
@@ -154,11 +149,7 @@ public class CustomerController : Controller
 			return NotFound();
 		}
 		var existingCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Name == customer.Name && c.Id != customer.Id);
-		if (existingCustomer != null)
-		{
-			ModelState.AddModelError("Name", "Tên đã tồn tại. Vui lòng chọn tên khác.");
-			return View(customer);
-		}
+		 
 		var originalCustomer = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == customer.Id);
 		customer.CreatedBy = originalCustomer.CreatedBy;
 		customer.CreationTime = originalCustomer.CreationTime;
@@ -166,7 +157,16 @@ public class CustomerController : Controller
 		customer.UpdationTime = DateTime.Now;
 		if (!ModelState.IsValid)
 		{
-			try
+            var statusList = Enum.GetValues(typeof(TypeDocument))
+                             .Cast<TypeDocument>()
+                             .Select(e => new SelectListItem
+                             {
+                                 Value = ((int)e).ToString(),
+                                 Text = GetEnumDisplayName(e)
+                             }).ToList();
+
+            ViewData["StatusList"] = new SelectList(statusList, "Value", "Text");
+            try
 			{
 				_context.Update(customer);
 				await _context.SaveChangesAsync();

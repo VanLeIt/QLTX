@@ -23,6 +23,10 @@ namespace QLTX.Controllers
 			{
 				ViewBag.SuccessMessage = TempData["SuccessMessage"];
 			}
+			else
+			{
+				ViewBag.SuccessMessage = TempData["ErrorMessage"];
+			}
 			return _context.Roles != null ?
 						  View(await _context.Roles.Where(a=>a.IsDelete == false).ToListAsync()) :
 						  Problem("Không có bản ghi nào.");
@@ -51,8 +55,7 @@ namespace QLTX.Controllers
 		{
 			return View();
 		}
-
-
+		 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create([Bind("Id,Name,Description ")] Role role)
@@ -60,10 +63,10 @@ namespace QLTX.Controllers
 			if (RoleNameExists(role.Name))
 			{
 
-				ModelState.AddModelError("Name", "Tên role đã tồn tại.");
+				ModelState.AddModelError("Name", "Vai trò đã tồn tại.");
 				return View(role);
 			}
-			if (!ModelState.IsValid)
+			if (ModelState.IsValid)
 			{
 				role.CreatedBy = User.Identity.Name;
 				role.CreationTime = DateTime.Now;
@@ -113,7 +116,7 @@ namespace QLTX.Controllers
 			var existingRole = await _context.Roles.FirstOrDefaultAsync(c => c.Name == role.Name && c.Id != role.Id);
 			if (existingRole != null)
 			{
-				ModelState.AddModelError("Name", "Tên đã tồn tại. Vui lòng chọn tên khác.");
+				ModelState.AddModelError("Name", "Vai trò đã tồn tại.");
 				return View(role);
 			}
 			var originalRole = await _context.Roles.AsNoTracking().FirstOrDefaultAsync(c => c.Id == role.Id);
@@ -121,7 +124,7 @@ namespace QLTX.Controllers
 			role.CreationTime = originalRole.CreationTime;
 			role.UpdatedBy = User.Identity.Name;
 			role.UpdationTime = DateTime.Now;
-			if (!ModelState.IsValid)
+			if (ModelState.IsValid)
 			{
 				try
 				{

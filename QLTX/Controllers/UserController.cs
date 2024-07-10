@@ -40,16 +40,8 @@ namespace QLTX.Controllers
 				.Include(u => u.UserRoles)
 				.ThenInclude(ur => ur.Role)
 				.Where(a => a.IsDelete == false)
-				.ToListAsync();
-
-			if (usersWithRoles != null)
-			{
-				return View(usersWithRoles);
-			}
-			else
-			{
-				return Problem("Không có người dùng nào được tìm thấy.");
-			} 
+				.ToListAsync(); 
+				return View(usersWithRoles); 
 		} 
 
 		public async Task<IActionResult> Details(string? id)
@@ -209,45 +201,22 @@ namespace QLTX.Controllers
 			return Json(result);
 		}
 
-		//public async Task<bool> ChangeRole(UserRolesDto userRoles)
-		//{
-		//	var result = false;  
-		//	var user = await _context.Users
-		//		.Include(u => u.UserRoles)
-		//		.FirstOrDefaultAsync(u => u.Id == userRoles.UserId); 
-		//	if (user != null)
-		//	{ 
-		//		_context.UserRoles.RemoveRange(user.UserRoles); 
-		//		foreach (var roleId in userRoles.RoleIds)
-		//		{
-		//			_context.UserRoles.Add(new UserRoles
-		//			{
-		//				UserId = userRoles.UserId,
-		//				RoleId = roleId
-		//			});
-		//		}
-				
-		//		await _context.SaveChangesAsync();
-		//		result = true;
-		//	}
-			 
-		//	return result;
-
-		//}
-
+		 
 		[Authorize(Roles = "admin")]
 		[HttpGet]
 		public async Task<IActionResult> EditRoles(string? id)
 		{
 			var user = await _context.Users
-			.Include(u => u.UserRoles)
-			.ThenInclude(ur => ur.Role)
-			.FirstOrDefaultAsync(u => u.Id == id); 
+				.Include(u => u.UserRoles)
+				.ThenInclude(ur => ur.Role)
+				.FirstOrDefaultAsync(u => u.Id == id);
+
 			if (user == null)
 			{
 				return NotFound();
-			} 
-			var roles = await _context.Roles.ToListAsync();
+			}
+
+			var roles = await _context.Roles.Where(a =>a.IsDelete == false).ToListAsync();
 			var model = new UserRoleViewModel
 			{
 				UserId = user.Id,
@@ -257,24 +226,16 @@ namespace QLTX.Controllers
 					Value = r.Id,
 					Text = r.Name
 				}).ToList(),
-				SelectedRoles = user.UserRoles.Count > 0 ? user.UserRoles.Select(ur => ur.RoleId).ToList() : new List<string>()
-			}; 
+				SelectedRoles = user.UserRoles?.Select(ur => ur.RoleId).ToList() ?? new List<string>()
+			};
+
 			return View(model);
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> EditRoles(UserRoleViewModel model)
 		{
-			if (ModelState.IsValid)
-			{
-				var roles = await _context.Roles.ToListAsync();
-				model.AvailableRoles = roles.Select(r => new SelectListItem
-				{
-					Value = r.Id,
-					Text = r.Name
-				}).ToList();
-				return View(model);
-			} 
+			  
 			var user = await _context.Users
 				.Include(u => u.UserRoles)
 				.FirstOrDefaultAsync(u => u.Id == model.UserId);
@@ -285,20 +246,25 @@ namespace QLTX.Controllers
 			}
 			 
 			_context.UserRoles.RemoveRange(user.UserRoles);
- 
-			foreach (var roleId in model.SelectedRoles)
+			 
+			if (model.SelectedRoles != null && model.SelectedRoles.Count > 0)
 			{
-				_context.UserRoles.Add(new UserRoles
+				foreach (var roleId in model.SelectedRoles)
 				{
-					UserId = user.Id,
-					RoleId = roleId
-				});
+					_context.UserRoles.Add(new UserRoles
+					{
+						UserId = user.Id,
+						RoleId = roleId
+					});
+				}
 			}
-			TempData["SuccessMessage"] = "Gán quyền thành công.";
+
 			await _context.SaveChangesAsync();
+			TempData["SuccessMessage"] = "Gán quyền thành công.";
 			return RedirectToAction("Index");
 		}
-		 
+
+
 		private bool UserExists(string id)
 		{
 			return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();

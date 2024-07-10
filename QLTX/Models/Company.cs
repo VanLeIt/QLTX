@@ -6,7 +6,11 @@ namespace QLTX.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
+
+		[Required(ErrorMessage = "Tên hãng là bắt buộc")]
+		[StringLength(100, ErrorMessage = "Tên hãng phải có độ dài từ {2} đến {1} ký tự.", MinimumLength = 2)]
+		[Display(Name = "Tên hãng")]
+		public string Name { get; set; }
         public string? Description { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreationTime { get; set; }

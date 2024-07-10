@@ -4,167 +4,166 @@ using Microsoft.EntityFrameworkCore;
 using QLTX.Data;
 using QLTX.Models;
 
-namespace QLTX.Controllers
+namespace QLTX.Controllers;
+
+[Authorize]
+public class CompanyController : Controller
 {
-	[Authorize]
-    public class CompanyController : Controller
+    private readonly QLTXDbContext _context;
+
+    public CompanyController(QLTXDbContext context)
     {
-        private readonly QLTXDbContext _context;
+        _context = context;
+    }
 
-        public CompanyController(QLTXDbContext context)
+    // GET: Company
+    public async Task<IActionResult> Index()
+    {
+        if (TempData.ContainsKey("SuccessMessage"))
         {
-            _context = context;
+            ViewBag.SuccessMessage = TempData["SuccessMessage"];
         }
-
-        // GET: Company
-        public async Task<IActionResult> Index()
+        else
         {
-            if (TempData.ContainsKey("SuccessMessage"))
-            {
-                ViewBag.SuccessMessage = TempData["SuccessMessage"];
-            }
-            return _context.Companies != null ? 
-                          View(await _context.Companies.Where(a=>a.IsDelete == false).ToListAsync()) :
-                          Problem("Entity set 'QLTXDbContext.Company'  is null.");
+            ViewBag.SuccessMessage = TempData["ErrorMessage"];
         }
+        return _context.Companies != null ?
+                  View(await _context.Companies.Where(a => a.IsDelete == false).ToListAsync()) :
+                  Problem("Không có bản ghi nào.");
+    }
 
-        // GET: Company/Details/5
-        public async Task<IActionResult> Details(int? id)
+    // GET: Company/Details/5
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null || _context.Companies == null)
         {
-            if (id == null || _context.Companies == null)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
+        var company = await _context.Companies
+                .FirstOrDefaultAsync(m => m.Id == id);
+        if (company == null)
+        {
+            return NotFound();
+        }
+        return View(company);
+    }
 
-            var company = await _context.Companies
-				.FirstOrDefaultAsync(m => m.Id == id);
-            if (company == null)
-            {
-                return NotFound();
-            }
+    // GET: Company/Create
+    public IActionResult Create()
+    {
+        return View();
+    }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Id,Name,Description ")] Company company)
+    {
+        if (CompanyExists(company.Name))
+        {
+            ModelState.AddModelError("Name", "Tên hãng xe đã tồn tại.");
             return View(company);
         }
-
-        // GET: Company/Create
-        public IActionResult Create()
+        if (!ModelState.IsValid)
         {
-            return View();
-        }
-
-         
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description ")] Company company)
-        {
-			if (CompanyExists(company.Name))
-			{
-				 
-				ModelState.AddModelError("Name", "Tên hãng xe đã tồn tại.");
-				return View(company);  
-			}
-            if (!ModelState.IsValid)
-            {
-			company.CreatedBy = User.Identity.Name;
+            company.CreatedBy = User.Identity.Name;
             company.CreationTime = DateTime.Now;
             company.IsDelete = false;
             company.UpdatedBy = null;
             company.UpdationTime = null;
-           
-                
-                _context.Add(company);
+
+
+            _context.Add(company);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Thêm mới thành công.";
+            return RedirectToAction(nameof(Index));
+        }
+        return View(company);
+    }
+    private bool CompanyExists(string name)
+    {
+        return _context.Companies.Any(c => c.Name == name);
+    }
+
+    // GET: Company/Edit/5
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null || _context.Companies == null)
+        {
+            return NotFound();
+        }
+
+        var company = await _context.Companies.FindAsync(id);
+        if (company == null)
+        {
+            return NotFound();
+        }
+        return View(company);
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Company company)
+    {
+        if (id != company.Id)
+        {
+            return NotFound();
+        }
+        var existingCompany = await _context.Companies.FirstOrDefaultAsync(c => c.Name == company.Name && c.Id != company.Id);
+        if (existingCompany != null)
+        {
+            ModelState.AddModelError("Name", "Tên hãng đã tồn tại.");
+            return View(company);
+        }
+        var originalCompany = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(c => c.Id == company.Id);
+        company.CreatedBy = originalCompany.CreatedBy;
+        company.CreationTime = originalCompany.CreationTime;
+        company.UpdatedBy = User.Identity.Name;
+        company.UpdationTime = DateTime.Now;
+        if (!ModelState.IsValid)
+        {
+            try
+            {
+                _context.Update(company);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Thêm mới thành công.";
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Cập nhật thành công.";
             }
-            return View(company);
-        }
-		private bool CompanyExists(string name)
-		{
-			return _context.Companies.Any(c => c.Name == name);
-		}
-
-		// GET: Company/Edit/5
-		public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Companies == null)
+            catch (DbUpdateConcurrencyException)
             {
-                return NotFound();
-            }
-
-            var company = await _context.Companies.FindAsync(id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-            return View(company);
-        }
-
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Company company)
-        {
-            if (id != company.Id)
-            {
-                return NotFound();
-            }
-			var existingCompany = await _context.Companies.FirstOrDefaultAsync(c => c.Name == company.Name && c.Id != company.Id);
-			if (existingCompany != null)
-			{
-				ModelState.AddModelError("Name", "Tên đã tồn tại. Vui lòng chọn tên khác.");
-				return View(company);
-			}
-			var originalCompany = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(c => c.Id == company.Id);
-            company.CreatedBy = originalCompany.CreatedBy;
-            company.CreationTime = originalCompany.CreationTime;
-            company.UpdatedBy = User.Identity.Name;
-            company.UpdationTime = DateTime.Now;
-            if (!ModelState.IsValid)
-            {
-                try
+                if (!CompanyExists(company.Id))
                 {
-                    _context.Update(company);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Cập nhật thành công.";
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!CompanyExists(company.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(company);
+            return RedirectToAction(nameof(Index));
         }
+        return View(company);
+    }
 
- 
 
-        public JsonResult Delete(int id)
+
+    public JsonResult Delete(int id)
+    {
+        bool result = false;
+
+        var company = _context.Companies.Find(id);
+        if (company != null)
         {
-            bool result = false;
-
-            var company = _context.Companies.Find(id);
-            if (company != null)
-            {
-                result = true;
-                //_context.Companies.Remove(company);
-                company.IsDelete = true;
-                _context.SaveChanges();
-				TempData["SuccessMessage"] = "Đã xóa thành công.";
-			}
-            return Json(result); 
+            result = true;
+            //_context.Companies.Remove(company);
+            company.IsDelete = true;
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Đã xóa thành công.";
         }
+        return Json(result);
+    }
 
-        private bool CompanyExists(int id)
-        {
-          return (_context.Companies?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+    private bool CompanyExists(int id)
+    {
+        return (_context.Companies?.Any(e => e.Id == id)).GetValueOrDefault();
     }
 }

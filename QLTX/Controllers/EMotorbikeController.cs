@@ -24,9 +24,13 @@ public class EMotorbikeController : Controller
         {
             ViewBag.SuccessMessage = TempData["SuccessMessage"];
         }
-        return _context.EMotorbikes != null ?
+		else
+		{
+			ViewBag.SuccessMessage = TempData["ErrorMessage"];
+		}
+		return _context.EMotorbikes != null ?
                       View(await _context.EMotorbikes.Include(t => t.TypeMotorbike).Where(a=>a.IsDelete == false).OrderByDescending(m => m.CreationTime).ToListAsync()) :
-                      Problem("Khong tim thay xe.");
+                      Problem("Không tìm thấy bản ghi nào.");
 
     }
 
@@ -52,7 +56,7 @@ public class EMotorbikeController : Controller
     // GET: EMotorbike/Create
     public IActionResult Create()
     {
-        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes, "Id", "Name");
+        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes.Where(a=> a.IsDelete==false), "Id", "Name");
 		//var statusList = Enum.GetValues(typeof(EMotorbikeStatus))
 		//				 .Cast<EMotorbikeStatus>()
 		//				 .Select(e => new SelectListItem
@@ -64,7 +68,7 @@ public class EMotorbikeController : Controller
 		//ViewData["StatusList"] = new SelectList(Enum.GetValues(typeof(EMotorbikeStatus)));
 		return View();
     }
-    private string GetEnumDisplayName(Enum enumValue)
+    private string? GetEnumDisplayName(Enum enumValue)
     {
         var displayAttribute = enumValue.GetType()
                                         .GetMember(enumValue.ToString())
@@ -82,7 +86,7 @@ public class EMotorbikeController : Controller
         if (EMotorbikeExists(eMotorbikes.License))
         {
             ModelState.AddModelError("License", "Biển số xe đã tồn tại.");
-            ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes, "Id", "Name", eMotorbikes.TypeMotorbikeId);
+            ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes.Where(a => a.IsDelete == false), "Id", "Name", eMotorbikes.TypeMotorbikeId);
             return View(eMotorbikes);
         }
 
@@ -112,7 +116,7 @@ public class EMotorbikeController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes, "Id", "Name", eMotorbikes.TypeMotorbikeId);
+        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes.Where(a => a.IsDelete == false), "Id", "Name", eMotorbikes.TypeMotorbikeId);
         return View(eMotorbikes);
     }
 
@@ -142,64 +146,12 @@ public class EMotorbikeController : Controller
                              Text = GetEnumDisplayName(e)
                          });
         ViewData["StatusList"] = new SelectList(statusList, "Value", "Text"); 
-        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes, "Id", "Name", eMotorbikes.TypeMotorbikeId);
+        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes.Where(a => a.IsDelete == false), "Id", "Name", eMotorbikes.TypeMotorbikeId);
 
         return View(eMotorbikes);
     }
 
-
-    //[HttpPost]
-    //[ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Edit(int id, [Bind("Id,License,VinNumber,Status,TypeMotorbikeId,Description")] EMotorbike eMotorbikes)
-    //{
-    //    if (id != eMotorbikes.Id)
-    //    {
-    //        return NotFound();
-    //    }
-    //    var existingEMotorbike = await _context.EMotorbikes.FirstOrDefaultAsync(c => c.License == eMotorbikes.License && c.Id != eMotorbikes.Id);
-    //    if (existingEMotorbike != null)
-    //    {
-    //        ModelState.AddModelError("License", "Bien so xe đã tồn tại. Vui lòng chọn lai.");
-    //        return View(eMotorbikes);
-    //    }
-    //    var statusList = Enum.GetValues(typeof(EMotorbikeStatus))
-    //                     .Cast<EMotorbikeStatus>()
-    //                     .Select(e => new SelectListItem
-    //                     {
-    //                         Value = ((int)e).ToString(),
-    //                         Text = GetEnumDisplayName(e)
-    //                     });
-    //    ViewData["StatusList"] = new SelectList(statusList, "Value", "Text", (int)eMotorbikes.Status);
-    //    ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes, "Id", "Name", eMotorbikes.TypeMotorbikeId);
-    //    var originalEMotorbike = await _context.EMotorbikes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == eMotorbikes.Id);
-    //    eMotorbikes.CreatedBy = originalEMotorbike.CreatedBy;
-    //    eMotorbikes.CreationTime = originalEMotorbike.CreationTime;
-
-    //    if (!ModelState.IsValid)
-    //    {
-    //        eMotorbikes.UpdatedBy = User.Identity.Name;
-    //        eMotorbikes.UpdationTime = DateTime.Now;
-    //        try
-    //        {
-    //            _context.Update(eMotorbikes);
-    //            await _context.SaveChangesAsync();
-    //            TempData["SuccessMessage"] = "Cập nhật thành công.";
-    //        }
-    //        catch (DbUpdateConcurrencyException)
-    //        {
-    //            if (!EMotorbikeExists(eMotorbikes.Id))
-    //            {
-    //                return NotFound();
-    //            }
-    //            else
-    //            {
-    //                throw;
-    //            }
-    //        }
-    //        return RedirectToAction(nameof(Index));
-    //    }
-    //    return View(eMotorbikes);
-    //}
+     
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, [Bind("Id,License,VinNumber,Status,TypeMotorbikeId,Description")] EMotorbike eMotorbikes, IFormFile ImageFile)
@@ -211,7 +163,7 @@ public class EMotorbikeController : Controller
         var existingEMotorbike = await _context.EMotorbikes.FirstOrDefaultAsync(c => c.License == eMotorbikes.License && c.Id != eMotorbikes.Id);
         if (existingEMotorbike != null)
         {
-            ModelState.AddModelError("License", "Biển số xe đã tồn tại. Vui lòng chọn lại.");
+            ModelState.AddModelError("License", "Biển số xe đã tồn tại.");
             return View(eMotorbikes);
         }
         var originalEMotorbike = await _context.EMotorbikes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == eMotorbikes.Id);
@@ -269,7 +221,7 @@ public class EMotorbikeController : Controller
                          });
 
         ViewData["StatusList"] = new SelectList(statusList, "Value", "Text", (int)eMotorbikes.Status);
-        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes, "Id", "Name", eMotorbikes.TypeMotorbikeId);
+        ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes.Where(a => a.IsDelete == false), "Id", "Name", eMotorbikes.TypeMotorbikeId);
         return View(eMotorbikes);
     }
 

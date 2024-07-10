@@ -12,8 +12,8 @@ using QLTX.Data;
 namespace QLTX.Migrations
 {
     [DbContext(typeof(QLTXDbContext))]
-    [Migration("20240629095259_updateUser")]
-    partial class updateUser
+    [Migration("20240709171119_updateRental")]
+    partial class updateRental
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -193,7 +193,8 @@ namespace QLTX.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -204,6 +205,43 @@ namespace QLTX.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("QLTX.Models.Config", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("PriceDay")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PriceHour")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PriceWeek")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Configs");
                 });
 
             modelBuilder.Entity("QLTX.Models.Customer", b =>
@@ -274,17 +312,20 @@ namespace QLTX.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
                     b.Property<string>("License")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -300,7 +341,8 @@ namespace QLTX.Migrations
 
                     b.Property<string>("VinNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -343,8 +385,8 @@ namespace QLTX.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("RetalTime")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("RetalTime")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Service")
                         .HasColumnType("int");
@@ -361,15 +403,9 @@ namespace QLTX.Migrations
                     b.Property<DateTime?>("UpdationTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Rentals");
                 });
@@ -382,14 +418,9 @@ namespace QLTX.Migrations
                     b.Property<int>("RentalId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RentalId1")
-                        .HasColumnType("int");
-
                     b.HasKey("EMotorbileId", "RentalId");
 
                     b.HasIndex("RentalId");
-
-                    b.HasIndex("RentalId1");
 
                     b.ToTable("RentalDetails");
                 });
@@ -471,7 +502,8 @@ namespace QLTX.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Power")
                         .HasColumnType("nvarchar(max)");
@@ -664,15 +696,7 @@ namespace QLTX.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("QLTX.Models.User", "User")
-                        .WithMany("Rentals")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Customer");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QLTX.Models.RentalDetail", b =>
@@ -684,14 +708,10 @@ namespace QLTX.Migrations
                         .IsRequired();
 
                     b.HasOne("QLTX.Models.Rental", "Rental")
-                        .WithMany()
+                        .WithMany("RentlDetails")
                         .HasForeignKey("RentalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("QLTX.Models.Rental", null)
-                        .WithMany("RentlDetails")
-                        .HasForeignKey("RentalId1");
 
                     b.Navigation("EMotorbike");
 
@@ -753,8 +773,6 @@ namespace QLTX.Migrations
                     b.Navigation("Claims");
 
                     b.Navigation("Logins");
-
-                    b.Navigation("Rentals");
 
                     b.Navigation("Tokens");
 

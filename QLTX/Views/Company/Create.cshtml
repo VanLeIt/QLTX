@@ -10,17 +10,13 @@
 		<h2 class="mt-4">Thêm mới</h2>
 		<ol class="breadcrumb mb-4">
 			<li class="breadcrumb-item active">Hãng xe</li>
-		</ol>
-
+		</ol> 
 		<hr />
 		<div class="row">
 			<div class="col-md-4">
 				<form asp-action="Create">
-					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-
-					<div class="mb-3">
-
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div> 
+					<div class="mb-3"> 
 						<label asp-for="Name" class="control-label mb-2">Tên hãng xe</label>
 						<input asp-for="Name" class="form-control" />
 						<span asp-validation-for="Name" class="text-danger"></span>
@@ -29,20 +25,16 @@
 						<label asp-for="Description" class="control-label mb-2">Mô tả</label>
 						<input asp-for="Description" class="form-control" />
 						<span asp-validation-for="Description" class="text-danger"></span>
-					</div>
-
+					</div> 
 					<div class="form-group d-flex justify-content-between align-items-center">
 						<a asp-action="Index" class="btn btn-secondary">Đóng</a>
 						<button type="submit" class="btn btn-primary">
 							<i class="fas fa-save"></i> Lưu
-						</button>
-						
+						</button> 
 					</div>
 				</form>
 			</div>
-		</div>
-
-		 
+		</div> 
 	</div>
 </main>
 @section Scripts {

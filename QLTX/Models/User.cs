@@ -17,8 +17,7 @@ public class User : IdentityUser
 
 	[StringLength(100)]
 	public string? UpdatedBy { get; set; }
-	public DateTime? UpdationTime { get; set; }
-	public ICollection<Rental>? Rentals { get; set; }
+	public DateTime? UpdationTime { get; set; } 
     public bool IsDelete { get; set; }
 
 

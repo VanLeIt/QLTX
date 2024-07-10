@@ -1,4 +1,6 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using QLTX.Data;
@@ -7,7 +9,12 @@ using QLTX.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("qltx") ?? throw new InvalidOperationException("Connection string 'qltx' not found.");
-
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("vi-VN");
+    options.SupportedCultures = new[] { new CultureInfo("vi-VN") };
+    options.SupportedUICultures = new[] { new CultureInfo("vi-VN") };
+});
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<QLTXDbContext>(options =>

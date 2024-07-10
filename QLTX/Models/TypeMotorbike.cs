@@ -6,6 +6,10 @@ public class TypeMotorbike
 {
 	[Key]
 	public int Id { get; set; }
+
+	[Required(ErrorMessage = "Tên loại xe là bắt buộc")]
+	[StringLength(255, ErrorMessage = "Tên loại xe phải có độ dài từ {2} đến {1} ký tự.", MinimumLength = 2)]
+	[Display(Name = "Tên đầy đủ")]
 	public string Name { get; set; }
 	public string? Description { get; set; }
 	public string? Power {  get; set; }

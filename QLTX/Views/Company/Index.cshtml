@@ -5,8 +5,7 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	int index = 0;
 }
-
-
+ 
 <main>
 	<div class="container-fluid px-4">
 		<h2 class="mt-4">
@@ -24,7 +23,7 @@
 
 		<div class="card mb-4">
 			<div class="card-header">
-				<i class="fas fa-table me-1"></i>
+				<i class="fas fa-warehouse me-1"></i>
 				Danh sách hãng xe
 			</div>
 			<div class="card-body table-responsive">
@@ -35,7 +34,7 @@
 								STT
 							</th>
 							<th>
-								Tên hãng
+								Hãng xe
 							</th>
 
 							<th>
@@ -47,8 +46,7 @@
 					</thead>
 					<tbody>
 						@if (Model != null)
-						{
-
+						{ 
 							@foreach (var item in Model)
 							{
 								<tr>
@@ -75,9 +73,7 @@
 
 										<a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
 											<i class="fas fa-trash-alt fa-lg"></i>
-										</a>
-
-
+										</a> 
 									</td>
 								</tr>
 							}

@@ -22,6 +22,7 @@ public class QLTXDbContext : IdentityDbContext<User, Role, string,
 	public DbSet<RentalDetail> RentalDetails { get; set; } = default!;
 	public DbSet<Customer> Customers { get; set; } = default!;
 	public DbSet<Bill> Bills { get; set; } = default!;
+	public DbSet<Config> Configs { get; set; } = default!;
 	//public DbSet<Role> Roles { get; set; } = default!;
 	//public DbSet<UserRoles> UserRoles { get; set; } = default!;
 
@@ -41,8 +42,17 @@ public class QLTXDbContext : IdentityDbContext<User, Role, string,
 
 		modelBuilder.Entity<RentalDetail>()
 		.HasKey(rd => new { rd.EMotorbileId, rd.RentalId });
-		 
-		modelBuilder.Entity<RentalDetail>()
+
+        modelBuilder.Entity<RentalDetail>()
+            .HasOne(rd => rd.Rental)
+            .WithMany(r => r.RentlDetails)
+            .HasForeignKey(rd => rd.RentalId);
+
+        modelBuilder.Entity<RentalDetail>()
+            .HasOne(rd => rd.EMotorbike)
+            .WithMany()
+            .HasForeignKey(rd => rd.EMotorbileId);
+        /*modelBuilder.Entity<RentalDetail>()
 			.HasOne(rd => rd.EMotorbike)
 			.WithMany()
 			.HasForeignKey(rd => rd.EMotorbileId);
@@ -50,7 +60,7 @@ public class QLTXDbContext : IdentityDbContext<User, Role, string,
 		modelBuilder.Entity<RentalDetail>()
 			.HasOne(rd => rd.Rental)
 			.WithMany()
-			.HasForeignKey(rd => rd.RentalId);
+			.HasForeignKey(rd => rd.RentalId);*/
 		modelBuilder.Entity<User>(b =>
 		{
 			b.ToTable("Users");

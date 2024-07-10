@@ -14,7 +14,6 @@ public class TypeMotorbikeController : Controller
 	{
 		_context = context;
 	}
-
 	 
 	public async Task<IActionResult> Index()
 	{
@@ -22,10 +21,13 @@ public class TypeMotorbikeController : Controller
 		{
 			ViewBag.SuccessMessage = TempData["SuccessMessage"];
 		}
+		else
+		{
+			ViewBag.SuccessMessage = TempData["ErrorMessage"];
+		}
 		return _context.TypeMotorbikes != null ?
 					  View(await _context.TypeMotorbikes.Include(t=> t.Company).Where(a=>a.IsDelete ==false).ToListAsync()) :
-					  Problem("Không tìm thấy bản ghi.");
-		 
+					  Problem("Không tìm thấy bản ghi nào."); 
 	}
 
  
@@ -34,8 +36,7 @@ public class TypeMotorbikeController : Controller
 		if (id == null || _context.TypeMotorbikes == null)
 		{
 			return NotFound();
-		}
-
+		} 
 		var typeMotorbikes = await _context.TypeMotorbikes
 			.Include(t => t.Company)
 			.FirstOrDefaultAsync(m => m.Id == id);
@@ -50,7 +51,7 @@ public class TypeMotorbikeController : Controller
 	// GET: TypeMotorbike/Create
 	public IActionResult Create()
 	{
-		ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name");
+		ViewData["CompanyId"] = new SelectList(_context.Companies.Where(a => a.IsDelete == false), "Id", "Name");
 		return View();
 	}
 
@@ -65,7 +66,7 @@ public class TypeMotorbikeController : Controller
 			ModelState.AddModelError("Name", "Tên loai xe đã tồn tại.");
 			return View(typeMotorbikes);
 		}
-		ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", typeMotorbikes.CompanyId);
+		ViewData["CompanyId"] = new SelectList(_context.Companies.Where(a=>a.IsDelete == false), "Id", "Name", typeMotorbikes.CompanyId);
 		if (!ModelState.IsValid)
 		{
 			typeMotorbikes.CreatedBy = User.Identity.Name;
@@ -99,7 +100,7 @@ public class TypeMotorbikeController : Controller
 		{
 			return NotFound();
 		}
-		ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", typeMotorbikes.CompanyId);
+		ViewData["CompanyId"] = new SelectList(_context.Companies.Where(a=>a.IsDelete == false), "Id", "Name", typeMotorbikes.CompanyId);
 		return View(typeMotorbikes);
 	}
 
@@ -118,7 +119,7 @@ public class TypeMotorbikeController : Controller
 			ModelState.AddModelError("Name", "Tên đã tồn tại. Vui lòng chọn tên khác.");
 			return View(typeMotorbikes);
 		}
-		ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", typeMotorbikes.CompanyId);
+		ViewData["CompanyId"] = new SelectList(_context.Companies.Where(a => a.IsDelete == false), "Id", "Name", typeMotorbikes.CompanyId);
 		var originalTypeMotorbike = await _context.TypeMotorbikes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == typeMotorbikes.Id);
 		typeMotorbikes.CreatedBy = originalTypeMotorbike.CreatedBy;
 		typeMotorbikes.CreationTime = originalTypeMotorbike.CreationTime;

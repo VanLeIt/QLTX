@@ -1,5 +1,124 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<QLTX.Models.Rental>
+
 @{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int index = 0;
+}
+
+<main>
+    <div class="container-fluid px-4">
+        <h2 class="mt-4">Danh sách đơn thuê</h2>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div id="successMessage" class="alert alert-success alert-sm text-sm" role="alert">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Thêm mới</a>
+        </p>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-list me-1"></i>
+                Danh sách đơn thuê
+            </div>
+            <div class="card-body table-responsive">
+                <table id="datatablesSimple" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Khách hàng</th>
+                            <th>Ngày bắt đầu</th>
+                            <th>Ngày kết thúc</th>
+                            <th>Tổng thời gian</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center text-lg-center"><i class="fas fa-sliders-h"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@(++index)</td>
+                                    <td>@item.Customer.Name</td>
+                                    <td>@item.DateRetalFrom.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.DateRetalTo.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.RetalTime</td>
+                                    <td>@item.Status.ToString()</td>
+                                    <td class="text-center text-lg-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
+                                        <a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"><i class="fas fa-trash-alt fa-lg"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc muốn xóa mục này!
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post">
+                    <input type="hidden" id="deleteItemId" />
+                    <button type="submit" class="btn btn-danger">Xác nhận</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        setTimeout(function () {
+            var successMessage = document.getElementById("successMessage");
+            if (successMessage) {
+                successMessage.style.display = "none";
+            }
+        }, 3000);
+
+        function Confirm(id) {
+            document.getElementById('deleteItemId').value = id;
+        }
+
+        document.getElementById('deleteForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            var id = document.getElementById('deleteItemId').value;
+
+            $.ajax({
+                url: '/Rental/Delete/' + id,
+                type: 'POST',
+                success: function (response) {
+                    if (response) {
+                        window.location.reload();
+                    } else {
+                        alert('Đã xảy ra lỗi khi xóa mục này.');
+                    }
+                },
+                error: function () {
+                    alert('Đã xảy ra lỗi khi gửi yêu cầu xóa.');
+                }
+            });
+        });
+    </script>
 }

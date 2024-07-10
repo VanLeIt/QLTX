@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using QLTX.Data;
 using QLTX.Models;
 
 namespace QLTX.Controllers
@@ -9,16 +11,18 @@ namespace QLTX.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly QLTXDbContext _context;
+        public HomeController(ILogger<HomeController> logger , QLTXDbContext dbContext)
         {
             _logger = logger;
+            _context = dbContext;
         }
 
-        public IActionResult Index()
+        public IActionResult IndexAsync()
         {
             return View();
         }
+        
 
         public IActionResult Privacy()
         {
