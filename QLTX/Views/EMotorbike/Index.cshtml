@@ -123,13 +123,7 @@
 										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="  margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
 										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
 
-										@* <a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
-											<i class="fas fa-trash-alt fa-lg"></i>
-										</a>
-										@if (item.Status == EMotorbikeStatus.Ready)
-										{
-											<a href="javascript:void(0)" onclick="BrokenMotor(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Báo hỏng xe"><i class="fas fa-times fa-lg"></i></a>
-										} *@
+										 
 										<a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"><i class="fas fa-trash-alt fa-lg"></i></a>
 
 										@if (item.Status == EMotorbikeStatus.Ready)
@@ -179,18 +173,18 @@
 
 <style>
 	.bg-warning {
-		background-color: #ffc107; /* Bootstrap warning color */
-		color: white; /* Text color */
+		background-color: #ffc107; 
+		color: white;  
 	}
 
 	.bg-success {
-		background-color: #28a745; /* Bootstrap success color */
-		color: white; /* Text color */
+		background-color: #28a745;  
+		color: white; 
 	}
 
 	.bg-danger {
-		background-color: #dc3545; /* Bootstrap danger color */
-		color: white; /* Text color */
+		background-color: #dc3545; 
+		color: white;  
 	}
 </style>
 

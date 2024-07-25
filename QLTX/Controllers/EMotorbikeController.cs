@@ -57,15 +57,7 @@ public class EMotorbikeController : Controller
     public IActionResult Create()
     {
         ViewData["TypeMotorbikeId"] = new SelectList(_context.TypeMotorbikes.Where(a=> a.IsDelete==false), "Id", "Name");
-		//var statusList = Enum.GetValues(typeof(EMotorbikeStatus))
-		//				 .Cast<EMotorbikeStatus>()
-		//				 .Select(e => new SelectListItem
-		//				 {
-		//					 Value = ((int)e).ToString(),
-		//					 Text = GetEnumDisplayName(e)
-		//				 });
-		//ViewData["StatusList"] = new SelectList(statusList, "Value", "Text");
-		//ViewData["StatusList"] = new SelectList(Enum.GetValues(typeof(EMotorbikeStatus)));
+		 
 		return View();
     }
     private string? GetEnumDisplayName(Enum enumValue)
@@ -254,9 +246,9 @@ public class EMotorbikeController : Controller
     public async Task<JsonResult> ChangBroken(int id)
     {
         bool result = false;
-        // var emotor = _context.EMotorbikes.Find(id);
+         
         var emotor = _context.EMotorbikes.Find(id);
-        //var emotor = _context.RentalDetails.Where(a => a.RentalId == id).ToList();
+        
         if (emotor != null)
         {
             result = true;
@@ -272,9 +264,8 @@ public class EMotorbikeController : Controller
 	public async Task<JsonResult> ChangReady(int id)
 	{
 		bool result = false;
-		// var emotor = _context.EMotorbikes.Find(id);
-		var emotor = _context.EMotorbikes.Find(id);
-		//var emotor = _context.RentalDetails.Where(a => a.RentalId == id).ToList();
+		 
+		var emotor = _context.EMotorbikes.Find(id); 
 		if (emotor != null)
 		{
 			result = true;

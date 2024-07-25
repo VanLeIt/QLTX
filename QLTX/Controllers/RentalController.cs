@@ -39,7 +39,7 @@ public class RentalController : Controller
 							.OrderByDescending(r => r.CreationTime)
 							.ToListAsync();
 
-		// Kiểm tra và cập nhật trạng thái cho từng đơn thuê xe
+		 
 		foreach (var rental in rentals)
 		{
 			if (rental.DateRetalTo < DateTime.Now && rental.Status == RentalStatus.Renting )
@@ -49,7 +49,7 @@ public class RentalController : Controller
 			}
 		}
 
-		await _context.SaveChangesAsync(); // Lưu các thay đổi vào cơ sở dữ liệu
+		await _context.SaveChangesAsync();  
 
 		return View(rentals);
 	}
@@ -124,7 +124,7 @@ public class RentalController : Controller
 
             if (viewModel.EmotorIds != null && viewModel.EmotorIds.Any())
             {
-                //var ids = viewModel.EmotorIds.Split(',');
+                
 				var ids = viewModel.EmotorIds.Split(',')
 							 .Select(int.Parse)
 							 .ToArray();
@@ -161,7 +161,7 @@ public class RentalController : Controller
 	public async Task<IActionResult> Edit(int? id)
 	{
 		var rental = await _context.Rentals.FindAsync(id);
-		//var config = await _context.Configs.FirstOrDefaultAsync();
+		 
 		var emotors = _context.EMotorbikes.Where(e => e.Status == EMotorbikeStatus.Ready && e.IsDelete == false).ToList();
 		ViewData["IdCustomer"] = new SelectList(_context.Customers.Where(a => a.IsDelete == false).Select(c => new { Id = c.Id, FullName = $"{c.Name} - {c.IdDocument}" }), "Id", "FullName");
 		var viewModel = new CreateRental
@@ -242,7 +242,7 @@ public class RentalController : Controller
 				var emoto = _context.EMotorbikes.Find(detail.EMotorbileId);
 				if (emoto != null)
 				{
-					emoto.Status = EMotorbikeStatus.Ready; // Giả sử trạng thái cần cập nhật là 'Available'
+					emoto.Status = EMotorbikeStatus.Ready;  
 				}
 			}
 			_context.SaveChanges();
@@ -280,7 +280,7 @@ public class RentalController : Controller
 	public async Task<JsonResult> SuccessStatusAsync(int id )
 	{
 		bool result = false;
-       // var emotor = _context.EMotorbikes.Find(id);
+       
 		var rentalStatus = _context.Rentals.Find(id);
         var emotor = _context.RentalDetails.Where(a=>a.RentalId == id).ToList();
 		if (rentalStatus != null)

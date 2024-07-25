@@ -1,4 +1,4 @@
-﻿@model QLTX.ViewModels.CreateRental // Sử dụng model CreateRental cho việc chỉnh sửa
+﻿@model QLTX.ViewModels.CreateRental 
 <main>
     <div class="container-fluid px-4">
         <h2 class="mt-4">Cập nhật đơn thuê</h2>
@@ -130,13 +130,13 @@
             var price;
             var rentalTime = 0;
 
-            serviceType.innerHTML = ''; // Clear the serviceType options
+            serviceType.innerHTML = '';  
 
-            if (timeDiff < 10 * 3600 * 1000) { // Less than 10 hours
+            if (timeDiff < 10 * 3600 * 1000) {  
                 serviceType.innerHTML = '<option value="1">Giờ</option>';
-            } else if (timeDiff < 6 * 24 * 3600 * 1000) { // Less than 6 days
+            } else if (timeDiff < 6 * 24 * 3600 * 1000) {  
                 serviceType.innerHTML = '<option value="1">Giờ</option><option value="2">Ngày</option>';
-            } else { // 6 days or more
+            } else {  
                 serviceType.innerHTML = '<option value="1">Giờ</option><option value="2">Ngày</option><option value="3">Tuần</option>';
             }
 
