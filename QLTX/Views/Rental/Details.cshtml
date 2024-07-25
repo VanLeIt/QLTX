@@ -4,6 +4,38 @@
     ViewData["Title"] = "Chi tiết đơn thuê";
     Layout = "~/Views/Shared/_Layout.cshtml";
     int index = 1;
+    var serviceText = "";
+    var overdueTime = TimeSpan.Zero;
+    var lateFee = 0;
+    
+    switch (Model.Service)
+    {
+        case RentalService.Hour:
+
+            serviceText = "Giờ";
+            break;
+        case RentalService.Day:
+
+            serviceText = "Ngày";
+            break;
+        case RentalService.Week:
+
+            serviceText = "Tuần";
+            break;
+    }
+     
+    if (Model.Status == RentalStatus.Expired)
+    {
+        var now = DateTime.Now;
+        if (now > Model.DateRetalTo)
+        {
+            overdueTime = now - Model.DateRetalTo;
+
+            // Calculate late fee
+            var totalMinutes = (int)overdueTime.TotalMinutes;
+            lateFee = (totalMinutes / 30) * 5000; // 5,000 đ per 30 minutes
+        }
+    }
 }
 
 <main>
@@ -30,29 +62,81 @@
                 @Model.DateRetalTo.ToString("dd/MM/yyyy HH:mm")
             </dd>
             <dt class="col-sm-2">
-                Thời gian thuê (giờ)
+                Thời gian thuê 
             </dt>
             <dd class="col-sm-10">
-                @Model.RetalTime
+                @Model.RetalTime @serviceText
             </dd>
             <dt class="col-sm-2">
-                Dịch vụ
+                Trạng thái
             </dt>
             <dd class="col-sm-10">
-                @Model.Service
+                @if (Model.Status == RentalStatus.Renting)
+                {
+                    <span class="bg-warning">Đang thuê</span>
+                }
+                else if (Model.Status == RentalStatus.Success)
+                {
+                    <span class="bg-success">Hoàn thành</span>
+                }
+                else if (Model.Status == RentalStatus.Cancel)
+                {
+                    <span class="bg-secondary">Hủy</span>
+                }
+                else if (Model.Status == RentalStatus.Expired)
+                {
+                    <span class="bg-danger">Quá hạn</span>
+                }
             </dd>
+            @if (overdueTime > TimeSpan.Zero)
+            {
+                <dt class="col-sm-2">
+                    Thời gian quá hạn
+                </dt>
+                <dd class="col-sm-10">
+                    @if (overdueTime.TotalMinutes < 60)
+                    {
+                        @($"{overdueTime.Minutes} phút")
+                    }
+                    else if (overdueTime.TotalHours < 24)
+                    {
+                        @($"{overdueTime.Hours} giờ, {overdueTime.Minutes} phút")
+                    }
+                    else
+                    {
+                        @($"{overdueTime.Days} ngày, {overdueTime.Hours % 24} giờ, {overdueTime.Minutes} phút")
+                    }
+                </dd>
+                <dt class="col-sm-2">
+                    Phí quá hạn
+                </dt>
+                <dd class="col-sm-10">
+                    @string.Format("{0:0,0} đ", lateFee)
+                </dd>
+            }
             <dt class="col-sm-2">
-                Tổng tiền
+                Đơn giá trung bình
             </dt>
             <dd class="col-sm-10">
-                @Model.Price
+                @string.Format("{0:0,0} đ", @Model.Price)
             </dd>
             <dt class="col-sm-2">
+                Thành tiền
+            </dt>
+            <dd class="col-sm-10">
+                @string.Format("{0:0,0} đ", @Model.Total)
+            </dd>
+           
+            @if (Model.Note is not null)
+            {
+                <dt class="col-sm-2">
                 Ghi chú
             </dt>
             <dd class="col-sm-10">
                 @Model.Note
             </dd>
+            }
+            
             <dt class="col-sm-2">
                 Tạo bởi
             </dt>
@@ -79,6 +163,7 @@
                             <th>STT</th>
                             <th>Biển số xe</th>
                             <th>VIN</th>
+                            <th>Giá thuê</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,6 +173,7 @@
                                 <td>@index</td>
                                 <td>@(detail.EMotorbike.License)</td>
                                 <td>@(detail.EMotorbike.VinNumber)</td>
+                                <td>@string.Format("{0:0,0} đ/h", (detail.EMotorbike.TypeMotorbike.Price))</td>
                             </tr>
                             index++;
                         }
@@ -112,3 +198,33 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+<style>
+    .bg-warning {
+        background-color: #ffc107; /* Bootstrap warning color */
+        color: white; /* Text color */
+        border-radius: 5px;
+        padding: 3px
+    }
+
+    .bg-success {
+        background-color: #28a745; /* Bootstrap success color */
+        color: white; /* Text color */
+        border-radius: 5px;
+        padding: 3px
+    }
+
+    
+    .bg-danger {
+        background-color: #dc3545; /* Bootstrap danger color */
+        color: white; /* Text color */
+        border-radius: 5px;
+        padding: 3px
+    }
+
+    .bg-secondary {
+        background-color: #6C757D; /* Bootstrap danger color */
+        color: white; /* Text color */
+        border-radius: 5px;
+        padding: 3px
+    }
+</style>

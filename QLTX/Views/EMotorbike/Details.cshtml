@@ -3,16 +3,31 @@
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
-}
+    var statusClass = "";
+    var statusText = "";
 
- 
- 
+    switch (Model.Status)
+    {
+        case EMotorbikeStatus.Renting:
+            statusClass = "bg-warning";
+            statusText = "Đang thuê";
+            break;
+        case EMotorbikeStatus.Ready:
+            statusClass = "bg-success";
+            statusText = "Sẵn sàng";
+            break;
+        case EMotorbikeStatus.Broken:
+            statusClass = "bg-danger";
+            statusText = "Xe hỏng";
+            break;
+    }
+}
 
 <main>
     <div class="container-fluid px-4">
         <h2 class="mt-4">Chi tiết</h2>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item active">Loại xe</li>
+            <li class="breadcrumb-item active">Xe</li>
         </ol>
         <hr />
         <div class="row">
@@ -40,14 +55,20 @@
                         Trạng thái
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Status)
+                        <span class="px-2 py-1 rounded text-white @statusClass">@statusText</span> @* @Html.DisplayFor(model => model.Status) *@
                     </dd>
-                    <dt class="col-sm-4">
-                        Mô tả
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Description)
-                    </dd>
+                    
+                   
+                    @if (Model.Description is not null)
+                    {
+                        <dt class="col-sm-4">
+                            Mô tả
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Description)
+                        </dd>
+                    }
+                    
                     <dt class="col-sm-4">
                         Người tạo
                     </dt>
@@ -107,5 +128,24 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+        
     }
 }
+
+<style>
+    .bg-warning {
+        background-color: #ffc107; /* Bootstrap warning color */
+        color: white; /* Text color */
+    }
+
+    .bg-success {
+        background-color: #28a745; /* Bootstrap success color */
+        color: white; /* Text color */
+    }
+
+    .bg-danger {
+        background-color: #dc3545; /* Bootstrap danger color */
+        color: white; /* Text color */
+    }
+</style>

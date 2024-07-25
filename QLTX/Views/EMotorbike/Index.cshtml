@@ -62,6 +62,26 @@
 
 							@foreach (var item in Model)
 							{
+								var statusClass = "";
+								var statusText = "";
+
+								switch (item.Status)
+								{
+									case EMotorbikeStatus.Renting:
+										statusClass = "bg-warning";
+										statusText = "Đang thuê";
+										break;
+									case EMotorbikeStatus.Ready:
+										statusClass = "bg-success";
+										statusText = "Sẵn sàng";
+										break; 
+									case EMotorbikeStatus.Broken:
+										statusClass = "bg-danger";
+										statusText = "Xe hỏng";
+										break;
+								}
+ 
+								 
 								<tr>
 									<td>
 										@((++index))
@@ -80,15 +100,16 @@
 
 										<a asp-action="Details" style="text-decoration: none; color: black" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.License)</a>
 									</td>
-									<td>
+									<td class="d-flex align-items-center">
 										@Html.DisplayFor(modelItem => item.VinNumber)
 									</td>
 									<td>
 										@Html.DisplayFor(modelItem => item.TypeMotorbike.Name)
 									</td>
-									<td>
-										@Html.DisplayFor(modelItem => item.Status)
+									<td class="text-center">
+										<span class="px-2 py-1 rounded text-white @statusClass">@statusText</span>
 									</td>
+									 
 									<td style="text-align:center;">
 										<div>
 											@Html.DisplayFor(modelItem => item.CreatedBy)
@@ -102,11 +123,23 @@
 										<a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="  margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
 										<a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="  margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
 
-										<a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
+										@* <a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa">
 											<i class="fas fa-trash-alt fa-lg"></i>
 										</a>
+										@if (item.Status == EMotorbikeStatus.Ready)
+										{
+											<a href="javascript:void(0)" onclick="BrokenMotor(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Báo hỏng xe"><i class="fas fa-times fa-lg"></i></a>
+										} *@
+										<a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"><i class="fas fa-trash-alt fa-lg"></i></a>
 
-
+										@if (item.Status == EMotorbikeStatus.Ready)
+										{
+											<a href="javascript:void(0)" onclick="BrokenMotor(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Báo hỏng xe"><i class="fas fa-times fa-lg"></i></a>
+										}
+										@if (item.Status == EMotorbikeStatus.Broken)
+										{
+											<a href="javascript:void(0)" onclick="ReadyMotor(@item.Id)" class="text-success" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Xe đã sửa"><i class="fas fa-check-circle fa-lg"></i></a>
+										}
 									</td>
 								</tr>
 							}
@@ -144,6 +177,22 @@
 </div>
 
 
+<style>
+	.bg-warning {
+		background-color: #ffc107; /* Bootstrap warning color */
+		color: white; /* Text color */
+	}
+
+	.bg-success {
+		background-color: #28a745; /* Bootstrap success color */
+		color: white; /* Text color */
+	}
+
+	.bg-danger {
+		background-color: #dc3545; /* Bootstrap danger color */
+		color: white; /* Text color */
+	}
+</style>
 
 
 @section Scripts {
@@ -151,6 +200,39 @@
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
 	<script>
+		function BrokenMotor(id) {
+			$.ajax({
+				url: '/EMotorbike/ChangBroken/' + id,
+				type: 'POST',
+				success: function (response) {
+					if (response) {
+						window.location.reload();
+					} else {
+						alert('Đã xảy ra lỗi khi hủy đơn thuê.');
+					}
+				},
+				error: function () {
+					alert('Đã xảy ra lỗi khi gửi yêu cầu hủy đơn thuê.');
+				}
+			});
+		}
+
+		function ReadyMotor(id) {
+			$.ajax({
+				url: '/EMotorbike/ChangReady/' + id,
+				type: 'POST',
+				success: function (response) {
+					if (response) {
+						window.location.reload();
+					} else {
+						alert('Đã xảy ra lỗi khi hủy đơn thuê.');
+					}
+				},
+				error: function () {
+					alert('Đã xảy ra lỗi khi gửi yêu cầu hủy đơn thuê.');
+				}
+			});
+		}
 		setTimeout(function () {
 			var successMessage = document.getElementById("successMessage");
 			if (successMessage) {

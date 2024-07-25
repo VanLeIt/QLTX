@@ -113,60 +113,6 @@ namespace QLTX.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("QLTX.Models.Bill", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DatePay")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("RentalId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("StoreName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("SumAmount")
-                        .HasColumnType("float");
-
-                    b.Property<int>("SumEMotor")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdationTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RentalId");
-
-                    b.ToTable("Bills");
-                });
-
             modelBuilder.Entity("QLTX.Models.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -177,13 +123,15 @@ namespace QLTX.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
@@ -194,7 +142,8 @@ namespace QLTX.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdationTime")
                         .HasColumnType("datetime2");
@@ -202,43 +151,6 @@ namespace QLTX.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Companies");
-                });
-
-            modelBuilder.Entity("QLTX.Models.Config", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("PriceDay")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("PriceHour")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("PriceWeek")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Configs");
                 });
 
             modelBuilder.Entity("QLTX.Models.Customer", b =>
@@ -251,18 +163,21 @@ namespace QLTX.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("IdDocument")
                         .IsRequired()
@@ -273,17 +188,20 @@ namespace QLTX.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<int>("TypeDocument")
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdationTime")
                         .HasColumnType("datetime2");
@@ -303,7 +221,8 @@ namespace QLTX.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
@@ -331,7 +250,8 @@ namespace QLTX.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdationTime")
                         .HasColumnType("datetime2");
@@ -358,7 +278,8 @@ namespace QLTX.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
@@ -376,14 +297,14 @@ namespace QLTX.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Note")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
 
-                    b.Property<string>("RetalTime")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<float?>("RetalTime")
+                        .HasColumnType("real");
 
                     b.Property<int>("Service")
                         .HasColumnType("int");
@@ -391,11 +312,12 @@ namespace QLTX.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<double>("Total")
-                        .HasColumnType("float");
+                    b.Property<float>("Total")
+                        .HasColumnType("real");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdationTime")
                         .HasColumnType("datetime2");
@@ -409,15 +331,15 @@ namespace QLTX.Migrations
 
             modelBuilder.Entity("QLTX.Models.RentalDetail", b =>
                 {
-                    b.Property<int>("EMotorbileId")
-                        .HasColumnType("int");
-
                     b.Property<int>("RentalId")
                         .HasColumnType("int");
 
-                    b.HasKey("EMotorbileId", "RentalId");
+                    b.Property<int>("EMotorbileId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("RentalId");
+                    b.HasKey("RentalId", "EMotorbileId");
+
+                    b.HasIndex("EMotorbileId");
 
                     b.ToTable("RentalDetails");
                 });
@@ -432,13 +354,15 @@ namespace QLTX.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
@@ -452,7 +376,8 @@ namespace QLTX.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdationTime")
                         .HasColumnType("datetime2");
@@ -467,6 +392,39 @@ namespace QLTX.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
+            modelBuilder.Entity("QLTX.Models.Store", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Stores");
+                });
+
             modelBuilder.Entity("QLTX.Models.TypeMotorbike", b =>
                 {
                     b.Property<int>("Id")
@@ -475,24 +433,28 @@ namespace QLTX.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Battery")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Charging")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Distance")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
@@ -503,13 +465,19 @@ namespace QLTX.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Power")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
 
                     b.Property<string>("Speed")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdationTime")
                         .HasColumnType("datetime2");
@@ -663,17 +631,6 @@ namespace QLTX.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("QLTX.Models.Bill", b =>
-                {
-                    b.HasOne("QLTX.Models.Rental", "Rental")
-                        .WithMany()
-                        .HasForeignKey("RentalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rental");
-                });
-
             modelBuilder.Entity("QLTX.Models.EMotorbike", b =>
                 {
                     b.HasOne("QLTX.Models.TypeMotorbike", "TypeMotorbike")
@@ -699,7 +656,7 @@ namespace QLTX.Migrations
             modelBuilder.Entity("QLTX.Models.RentalDetail", b =>
                 {
                     b.HasOne("QLTX.Models.EMotorbike", "EMotorbike")
-                        .WithMany()
+                        .WithMany("RentlDetails")
                         .HasForeignKey("EMotorbileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -748,6 +705,11 @@ namespace QLTX.Migrations
             modelBuilder.Entity("QLTX.Models.Company", b =>
                 {
                     b.Navigation("TypeMotorbikes");
+                });
+
+            modelBuilder.Entity("QLTX.Models.EMotorbike", b =>
+                {
+                    b.Navigation("RentlDetails");
                 });
 
             modelBuilder.Entity("QLTX.Models.Rental", b =>

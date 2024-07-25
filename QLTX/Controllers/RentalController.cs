@@ -29,13 +29,30 @@ public class RentalController : Controller
         {
             ViewBag.SuccessMessage = TempData["ErrorMessage"];
         }
-        return _context.Rentals != null ?
-                      View(await _context.Rentals.Where(a => a.IsDelete == false).Include(r => r.Customer)
-            .Include(r => r.RentlDetails)
-            .ThenInclude(rd => rd.EMotorbike)
-            .ToListAsync()) :
-                      Problem("Không có bản ghi nào.");
-    }
+        
+
+		var rentals = await _context.Rentals
+							.Where(a => a.IsDelete == false)
+							.Include(r => r.Customer)
+							.Include(r => r.RentlDetails)
+							.ThenInclude(rd => rd.EMotorbike)
+							.OrderByDescending(r => r.CreationTime)
+							.ToListAsync();
+
+		// Kiểm tra và cập nhật trạng thái cho từng đơn thuê xe
+		foreach (var rental in rentals)
+		{
+			if (rental.DateRetalTo < DateTime.Now && rental.Status == RentalStatus.Renting )
+			{
+				rental.Status = RentalStatus.Expired;
+				_context.Update(rental);
+			}
+		}
+
+		await _context.SaveChangesAsync(); // Lưu các thay đổi vào cơ sở dữ liệu
+
+		return View(rentals);
+	}
 
     public async Task<IActionResult> Details(int? id)
     {
@@ -46,6 +63,7 @@ public class RentalController : Controller
         var rent = await _context.Rentals.Where(a => a.IsDelete == false).Include(r => r.Customer)
             .Include(r => r.RentlDetails)
             .ThenInclude(rd => rd.EMotorbike)
+            .ThenInclude(t=> t.TypeMotorbike)
                 .FirstOrDefaultAsync(m => m.Id == id);
         if (rent == null)
         {
@@ -65,45 +83,28 @@ public class RentalController : Controller
    
     public async Task<IActionResult> CreateAsync()
     {
-		var config = await _context.Configs.FirstOrDefaultAsync();
-		var emotors = _context.EMotorbikes.Where(e => e.Status == EMotorbikeStatus.Ready).ToList();  
+		 
+		var emotors = _context.EMotorbikes.Include(a=> a.TypeMotorbike).Where(e => e.Status == EMotorbikeStatus.Ready && e.IsDelete == false).ToList();  
+        
         ViewData["IdCustomer"] = new SelectList(_context.Customers.Where(a => a.IsDelete == false).Select(c => new { Id = c.Id, FullName = $"{c.Name} - {c.IdDocument}" }), "Id", "FullName"); 
         var viewModel = new CreateRental
         {
             Emotors = emotors,
-			Config = config
+			 
 		};
 
         return View(viewModel);
     }
 
-     
+
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateRental viewModel)
     {
         if (!ModelState.IsValid)
         {
-			var config = await _context.Configs.FirstOrDefaultAsync();
-			if (config != null)
-			{
-				switch (viewModel.Service)
-				{
-					case RentalService.Hour:
-						viewModel.Price = (double)config.PriceHour;
-						break;
-					case RentalService.Day:
-						viewModel.Price = (double)config.PriceDay;
-						break;
-					case RentalService.Week:
-						viewModel.Price = (double)config.PriceWeek;
-						break;
-					default:
-						break;
-				}
-			}
-
-			var rental = new Rental
+              
+            var rental = new Rental
             {
                 CustomerId = viewModel.IdCustomer,
                 DateRetalFrom = viewModel.DateRetalFrom,
@@ -111,56 +112,197 @@ public class RentalController : Controller
                 RetalTime = viewModel.RetalTime,
                 Service = viewModel.Service,
                 Price = viewModel.Price,
+                Total = viewModel.Total,
                 Note = viewModel.Note,
                 CreatedBy = User.Identity.Name,
                 CreationTime = DateTime.Now,
-               
                 IsDelete = false
-                 
             };
 
             _context.Rentals.Add(rental);
-             await _context.SaveChangesAsync();
-			if (viewModel.EmotorIds != null && viewModel.EmotorIds.Any())
-			{
-				foreach (var emotorId in viewModel.EmotorIds)
-				{
-					var rentalDetail = new RentalDetail
-					{
-						RentalId = rental.Id,
-						EMotorbileId = emotorId
-					};
+            await _context.SaveChangesAsync();
 
+            if (viewModel.EmotorIds != null && viewModel.EmotorIds.Any())
+            {
+                //var ids = viewModel.EmotorIds.Split(',');
+				var ids = viewModel.EmotorIds.Split(',')
+							 .Select(int.Parse)
+							 .ToArray();
+				var rentalDetails = new List<RentalDetail>();
+                foreach (var emotorId in ids)
+                {
+                    var rentalDetail = new RentalDetail
+                    {
+                        RentalId = rental.Id,
+                        EMotorbileId = emotorId
+                    };
+                    
+                    var motor = _context.EMotorbikes.FirstOrDefault(x => x.Id == emotorId);
+                    if (motor != null)
+                    {
+                        motor.Status = EMotorbikeStatus.Renting;
+                    }
 					_context.RentalDetails.Add(rentalDetail);
-				}
+					await _context.SaveChangesAsync();
 
+				}
 				await _context.SaveChangesAsync();
+				return RedirectToAction(nameof(Index));
 			}
+
             return RedirectToAction("Index");
         }
-        ViewData["IdCustomer"] = new SelectList(_context.Customers.Where(a => a.IsDelete == false).Select(c => new { Id = c.Id, FullName = $"{c.Name} - {c.IdDocument}" }), "Id", "FullName" , viewModel.IdCustomer); 
-        viewModel.Emotors = _context.EMotorbikes.Where(e => e.Status == EMotorbikeStatus.Ready).ToList();
+
+        ViewData["IdCustomer"] = new SelectList(_context.Customers.Where(a => a.IsDelete == false).Select(c => new { Id = c.Id, FullName = $"{c.Name} - {c.IdDocument}" }), "Id", "FullName", viewModel.IdCustomer);
+        viewModel.Emotors = _context.EMotorbikes.Where(e => e.Status == EMotorbikeStatus.Ready && e.IsDelete == false).ToList();
         return View(viewModel);
     }
+
+	public async Task<IActionResult> Edit(int? id)
+	{
+		var rental = await _context.Rentals.FindAsync(id);
+		//var config = await _context.Configs.FirstOrDefaultAsync();
+		var emotors = _context.EMotorbikes.Where(e => e.Status == EMotorbikeStatus.Ready && e.IsDelete == false).ToList();
+		ViewData["IdCustomer"] = new SelectList(_context.Customers.Where(a => a.IsDelete == false).Select(c => new { Id = c.Id, FullName = $"{c.Name} - {c.IdDocument}" }), "Id", "FullName");
+		var viewModel = new CreateRental
+		{
+			IdCustomer = rental.CustomerId,
+			DateRetalFrom = rental.DateRetalFrom,
+            DateRetalTo = rental.DateRetalTo,
+			RetalTime = rental.RetalTime,
+			Service = rental.Service,
+			Price = rental.Price,
+			Total = rental.Total,
+			Note = rental.Note, 
+		};
+
+		return View(viewModel);
+		 
+	}
+
+	[HttpPost]
+    public async Task<IActionResult> Edit(int id, [Bind("Id,DateRetalFrom,DateRetalTo,RetalTime,Status,Service,Note")] CreateRental rental)
+    {
+        if (id != rental.Id)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            try
+            {
+                var originalRental = await _context.Rentals 
+                    .FirstOrDefaultAsync(r => r.Id == id);
+
+                if (originalRental == null || originalRental.IsDelete)
+                {
+                    return NotFound();
+                } 
+                originalRental.DateRetalFrom = rental.DateRetalFrom;
+                originalRental.DateRetalTo = rental.DateRetalTo;
+                originalRental.Service = rental.Service;
+                originalRental.RetalTime = rental.RetalTime;
+                originalRental.Note = rental.Note;
+                originalRental.UpdatedBy = User.Identity.Name;
+                originalRental.UpdationTime = DateTime.Now;
+                if(rental.DateRetalTo > DateTime.Now)
+                {
+					originalRental.Status = RentalStatus.Renting;
+				}
+                  
+                _context.Update(originalRental);
+                await _context.SaveChangesAsync(); 
+                TempData["SuccessMessage"] = "Cập nhật thành công.";
+				return RedirectToAction(nameof(Index));
+			}
+            catch (DbUpdateConcurrencyException)
+            {
+                    throw;
+            } 
+        }
+
+        return View(rental);
+    }
+
 
     public JsonResult Delete(int id)
     {
         bool result = false;
 
         var company = _context.Rentals.Find(id);
-        if (company != null)
+		var emotor = _context.RentalDetails.Where(a => a.RentalId == id).ToList();
+		if (company != null)
         {
             result = true;
              
             company.IsDelete = true;
-            _context.SaveChanges();
+			foreach (var detail in emotor)
+			{
+				var emoto = _context.EMotorbikes.Find(detail.EMotorbileId);
+				if (emoto != null)
+				{
+					emoto.Status = EMotorbikeStatus.Ready; // Giả sử trạng thái cần cập nhật là 'Available'
+				}
+			}
+			_context.SaveChanges();
             TempData["SuccessMessage"] = "Đã xóa thành công.";
         }
         return Json(result);
     }
 
-	public async Task<Config> GetConfigAsync()
+
+    public JsonResult CancelStatus(int id )
+    {
+		bool result = false;
+
+		var rentalStatus = _context.Rentals.Find(id);
+		var emotor = _context.RentalDetails.Where(a => a.RentalId == id).ToList();
+		if (rentalStatus != null)
+		{
+			result = true;
+
+			rentalStatus.Status = RentalStatus.Cancel;
+			foreach (var detail in emotor)
+			{
+				var emoto = _context.EMotorbikes.Find(detail.EMotorbileId);
+				if (emoto != null)
+				{
+					emoto.Status = EMotorbikeStatus.Ready;  
+				}
+			}
+			_context.SaveChanges();
+			TempData["SuccessMessage"] = "Hủy đơn thuê thành công.";
+		}
+		return Json(result);
+	}
+
+	public async Task<JsonResult> SuccessStatusAsync(int id )
 	{
-		return await _context.Configs.FirstOrDefaultAsync();
+		bool result = false;
+       // var emotor = _context.EMotorbikes.Find(id);
+		var rentalStatus = _context.Rentals.Find(id);
+        var emotor = _context.RentalDetails.Where(a=>a.RentalId == id).ToList();
+		if (rentalStatus != null)
+		{
+			result = true;
+
+			rentalStatus.Status = RentalStatus.Success;
+			foreach (var detail in emotor)
+			{
+				var emoto = _context.EMotorbikes.Find(detail.EMotorbileId);
+				if (emoto != null)
+				{
+					emoto.Status = EMotorbikeStatus.Ready;  
+				}
+			}
+			_context.SaveChanges();
+			TempData["SuccessMessage"] = "Đã hoàn thành đơn thuê.";
+		}
+		return Json(result);
+	}
+	public async Task<Store> GetConfigAsync()
+	{
+		return await _context.Stores.FirstOrDefaultAsync();
 	}
 }

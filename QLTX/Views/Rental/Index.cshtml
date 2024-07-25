@@ -32,6 +32,7 @@
                             <th>Ngày bắt đầu</th>
                             <th>Ngày kết thúc</th>
                             <th>Tổng thời gian</th>
+                            <th>Thành tiền</th>
                             <th>Trạng thái</th>
                             <th class="text-center text-lg-center"><i class="fas fa-sliders-h"></i></th>
                         </tr>
@@ -41,17 +42,118 @@
                         {
                             @foreach (var item in Model)
                             {
+                                var statusClass = "";
+                                var statusText = "";
+                                var lateFee = 0;
+                                switch (item.Status)
+                                {
+                                    case RentalStatus.Renting:
+                                        statusClass = "bg-warning";
+                                        statusText = "Đang thuê";
+                                        break;
+                                    case RentalStatus.Success:
+                                        statusClass = "bg-success";
+                                        statusText = "Hoàn thành";
+                                        break;
+                                    case RentalStatus.Cancel:
+                                        statusClass = "bg-secondary";
+                                        statusText = "Hủy";
+                                        break;
+                                    case RentalStatus.Expired:
+                                        statusClass = "bg-danger";
+                                        statusText = "Quá hạn";
+                                        break;
+                                }
+
+                                var serviceText = "";
+
+                                switch (item.Service)
+                                {
+                                    case RentalService.Hour:
+                                        serviceText = "Giờ";
+                                        break;
+                                    case RentalService.Day:
+                                        serviceText = "Ngày";
+                                        break;
+                                    case RentalService.Week:
+                                        serviceText = "Tuần";
+                                        break;
+                                }
+
+                               @*  TimeSpan? overdueTime = null;
+                                if (item.Status == RentalStatus.Expired)
+                                {
+                                    overdueTime = DateTime.Now - item.DateRetalTo;
+                                } *@
+                                TimeSpan? overdueTime = null;
+                                if (item.Status == RentalStatus.Expired)
+                                {
+                                    overdueTime = DateTime.Now - item.DateRetalTo;
+
+                                    // Calculate late fee
+                                    if (overdueTime.HasValue)
+                                    {
+                                        int totalMinutes = (int)overdueTime.Value.TotalMinutes;
+                                        lateFee = (totalMinutes / 30) * 5000; // 5,000 đ per 30 minutes
+                                    }
+                                }
+
                                 <tr>
                                     <td>@(++index)</td>
-                                    <td>@item.Customer.Name</td>
-                                    <td>@item.DateRetalFrom.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.DateRetalTo.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.RetalTime</td>
-                                    <td>@item.Status.ToString()</td>
+                                    <td><a asp-action="Details" asp-route-id="@item.Id" style="text-decoration: none; color: black">@item.Customer.Name</a></td>
+                                    <td>@item.DateRetalFrom.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@item.DateRetalTo.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@item.RetalTime @serviceText</td>
+                                    <td>
+                                        @string.Format("{0:0,0} đ", item.Total) @if (lateFee > 0)
+                                        {
+                                            <span>+ @string.Format("{0:0,0} đ", lateFee) </span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="px-2 py-1 rounded text-white @statusClass">
+                                            @statusText
+                                            @if (overdueTime.HasValue)
+                                            {
+                                                <span>
+                                                    (
+                                                    @if (overdueTime.Value.TotalMinutes < 60)
+                                                    {
+                                                        @($"{overdueTime.Value.Minutes} phút")
+                                                    }
+                                                    else if (overdueTime.Value.TotalHours < 24)
+                                                    {
+                                                        @($"{overdueTime.Value.Hours} giờ, {overdueTime.Value.Minutes} phút")
+                                                    }
+                                                    else
+                                                    {
+                                                        @($"{overdueTime.Value.Days} ngày, {overdueTime.Value.Hours % 24} giờ, {overdueTime.Value.Minutes} phút")
+                                                    }
+                                                    )
+                                                </span>
+                                            }
+                                        </span>
+                                    </td>
                                     <td class="text-center text-lg-center">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
+                                        @if (item.Status == RentalStatus.Success)
+                                        {
+                                            <a class="text-warning" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật" disabled><i class="fas fa-edit fa-lg"></i></a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="text-warning" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Cập nhật"><i class="fas fa-edit fa-lg"></i></a>
+                                        }
                                         <a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
                                         <a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"><i class="fas fa-trash-alt fa-lg"></i></a>
+
+                                        @if (item.Status == RentalStatus.Renting)
+                                        {
+                                            <a href="javascript:void(0)" onclick="CancelRental(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Hủy"><i class="fas fa-times fa-lg"></i></a>
+                                        }
+                                        @if (item.Status == RentalStatus.Renting || item.Status == RentalStatus.Expired)
+                                        {
+                                            <a href="javascript:void(0)" onclick="MarkRentalSuccess(@item.Id)" class="text-success" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Hoàn thành"><i class="fas fa-check-circle fa-lg"></i></a>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -85,11 +187,63 @@
     </div>
 </div>
 
+<style>
+    .bg-warning {
+        background-color: #ffc107; /* Bootstrap warning color */
+        color: white; /* Text color */
+    }
+
+    .bg-success {
+        background-color: #28a745; /* Bootstrap success color */
+        color: white; /* Text color */
+    }
+
+    .bg-danger {
+        background-color: #dc3545; /* Bootstrap danger color */
+        color: white; /* Text color */
+    }
+</style>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        function CancelRental(id) {
+            $.ajax({
+                url: '/Rental/CancelStatus/' + id,
+                type: 'POST',
+                success: function (response) {
+                    if (response) {
+                        window.location.reload();
+                    } else {
+                        alert('Đã xảy ra lỗi khi hủy đơn thuê.');
+                    }
+                },
+                error: function () {
+                    alert('Đã xảy ra lỗi khi gửi yêu cầu hủy đơn thuê.');
+                }
+            });
+        }
+
+        // Function to mark rental as success
+        function MarkRentalSuccess(id) {
+            $.ajax({
+                url: '/Rental/SuccessStatus/' + id,
+                type: 'POST',
+                success: function (response) {
+                    if (response) {
+                        window.location.reload();
+                    } else {
+                        alert('Đã xảy ra lỗi khi hoàn thành đơn thuê.');
+                    }
+                },
+                error: function () {
+                    alert('Đã xảy ra lỗi khi gửi yêu cầu hoàn thành đơn thuê.');
+                }
+            });
+        }
+
         setTimeout(function () {
             var successMessage = document.getElementById("successMessage");
             if (successMessage) {

@@ -26,13 +26,18 @@ namespace QLTX.Models
 
 		[StringLength(500, ErrorMessage = "Đường dẫn ảnh không vượt quá {1} ký tự.")]
 		public string? ImageUrl { get; set; }
+
+        [StringLength(100)]
         public string CreatedBy { get; set; }
         public DateTime CreationTime { get; set; }
+
+        [StringLength(100)]
         public string? UpdatedBy { get; set;}
         public DateTime? UpdationTime { get; set; }
 		public bool IsDelete { get; set; }
+		public virtual ICollection<RentalDetail>? RentlDetails { get; set; } 
 
-    }
+	}
 
     public enum EMotorbikeStatus
     {

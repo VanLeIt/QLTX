@@ -11156,15 +11156,15 @@ body {
   border-collapse: collapse;
 }
 
-.datatable-table > tbody > tr > td,
-.datatable-table > tbody > tr > th,
-.datatable-table > tfoot > tr > td,
-.datatable-table > tfoot > tr > th,
-.datatable-table > thead > tr > td,
-.datatable-table > thead > tr > th {
-  vertical-align: top;
-  padding: 0.5rem 0.5rem;
-}
+    .datatable-table > tbody > tr > td,
+    .datatable-table > tbody > tr > th,
+    .datatable-table > tfoot > tr > td,
+    .datatable-table > tfoot > tr > th,
+    .datatable-table > thead > tr > td,
+    .datatable-table > thead > tr > th {
+        vertical-align: middle;
+        padding: 0.5rem 0.5rem;
+    }
 
 .datatable-table > thead > tr > th {
   vertical-align: bottom;

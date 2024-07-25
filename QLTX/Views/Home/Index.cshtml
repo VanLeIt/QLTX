@@ -1,8 +1,20 @@
-﻿
+﻿@model QLTX.ViewModels.DasboadDto
 @{
     ViewData["Title"] = "Home Page";
 }
+<script src="~/ckeditor/ckeditor.js"></script>
+<style>
+    .card-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
+        .card-body span {
+            font-size: 2em;
+            margin-left: 10px;
+        }
+</style>
 <main>
     <div class="container-fluid px-4">
         <h1 class="mt-4">Bảng điều khiển</h1>
@@ -12,43 +24,88 @@
         <div class="row">
             <div class="col-xl-3 col-md-6">
                 <div class="card bg-primary text-white mb-4">
-                    <div class="card-body">Xe đang thuê</div>
+                    <div class="card-body">Xe đang thuê <span >@Model.eMotorRenting</span></div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Xem chi tiết</a>
+                        <a class="small text-white stretched-link" asp-action="index" asp-controller="EMotorbike">Xem chi tiết</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6">
                 <div class="card bg-warning text-white mb-4">
-                    <div class="card-body">Đơn thuê</div>
+                    <div class="card-body">Đơn đang thuê <span>@Model.renting</span></div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Xem chi tiết</a>
+                        <a class="small text-white stretched-link" asp-action="index" asp-controller="Rental">Xem chi tiết</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6">
                 <div class="card bg-success text-white mb-4">
-                    <div class="card-body">Đơn hoàn thành</div>
+                    <div class="card-body">Đơn hoàn thành <span>@Model.rentalSuccess</span></div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Xem chi tiết</a>
+                        <a class="small text-white stretched-link" asp-action="index" asp-controller="Rental">Xem chi tiết</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6">
                 <div class="card bg-danger text-white mb-4">
-                    <div class="card-body">Tổng xe</div>
+                    <div class="card-body">Tổng xe <span>@Model.eMotor</span></div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Xem chi tiết</a>
+                        <a class="small text-white stretched-link" asp-action="index" asp-controller="EMotorbike">Xem chi tiết</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
                 </div>
             </div>
         </div>
+
+
          
-        
-         
+        <h2>@Model.Name</h2>
+        <p>
+			<strong>@Model.Description</strong>
+		</p>
+        <p>
+            <strong>Số điện thoại:</strong> @Model.PhoneNumber<br>
+            <strong>Email:</strong> @Model.Email<br>
+            <strong>Địa chỉ:</strong> @Model.Address
+        </p>
+        <div class="section">
+            <h4>1. Điều kiện thuê xe</h4>
+            <ul>
+                <li>Người thuê xe phải có giấy phép lái xe hợp lệ.</li>
+                <li>Người thuê xe phải đủ 18 tuổi trở lên ( từ 16 tuổi cho những loại xe vinfast evo200 và vinfast evo200 lite ).</li>
+                <li>Người thuê xe phải cung cấp giấy tờ tùy thân (CMND/CCCD hoặc hộ chiếu) để xác minh danh tính.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h4>2. Trách nhiệm của người thuê xe</h4>
+            <ul>
+                <li>Người thuê xe phải kiểm tra tình trạng xe trước khi nhận xe.</li>
+                <li>Người thuê xe phải tuân thủ luật giao thông và sử dụng xe đúng mục đích.</li>
+                <li>Người thuê xe phải chịu trách nhiệm về mọi hư hỏng hoặc mất mát của xe trong thời gian thuê.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h4>3. Chi phí thuê xe</h4>
+            <ul>
+                <li>Chi phí thuê xe sẽ được tính theo giờ, ngày hoặc tuần.</li>
+                <li>Người thuê xe phải thanh toán đầy đủ chi phí thuê xe trước khi nhận xe.</li>
+                <li>Các khoản phí phát sinh (nếu có) sẽ được tính thêm và thông báo trước cho người thuê xe.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h4>4. Chính sách hủy bỏ và hoàn tiền</h4>
+            <ul>
+                <li>Người thuê xe có thể hủy bỏ đơn thuê xe sau thời gian nhận xe 15 phút mà không mất phí.</li>
+                <li>Hủy bỏ đơn thuê xe sau 1 giờ kể từ thời gian nhận xe sẽ bị mất phí hủy bỏ.</li>
+                <li>Tiền đặt cọc ( nếu có ) sẽ được hoàn lại khi người thuê xe trả xe trong tình trạng nguyên vẹn.</li>
+            </ul>
+        </div> 
     </div>
+
 </main>

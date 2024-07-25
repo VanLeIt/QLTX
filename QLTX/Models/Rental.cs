@@ -8,22 +8,29 @@ public class Rental
 	public int Id { get; set; }
 	public int CustomerId { get; set; }
 	public Customer Customer { get; set; }
-/*	public string UserId { get; set; }
-	public User User { get; set; }*/
+
 	public DateTime DateRetalFrom { get; set; }
 	public DateTime DateRetalTo { get; set; }
-	public string? RetalTime { get; set; }
+	public float? RetalTime { get; set; }
 	public RentalService Service {  get; set; }
-	public double Price {  get; set; } 
+	public float Price {  get; set; } 
 	//public double KmStart { get; set; }
 	//public double KmEnd { get; set; }
 	public RentalStatus Status { get; set; } = RentalStatus.Renting;
-	public ICollection<RentalDetail> RentlDetails { get; set; } = new List<RentalDetail>();
-	public double Total { get; set; }
-	public string? Note { get; set; }
-	public string CreatedBy { get; set; }
+	public virtual ICollection<RentalDetail> RentlDetails { get; set; } 
+	//public int IdEmotor { get; set; }
+	//public EMotorbike EMotorbike { get; set; }
+	public float Total { get; set; }
+
+    [StringLength(255)]
+    public string? Note { get; set; }
+
+    [StringLength(100)]
+    public string CreatedBy { get; set; }
 	public DateTime CreationTime { get; set; }
-	public string? UpdatedBy { get; set; }
+
+    [StringLength(100)]
+    public string? UpdatedBy { get; set; }
 	public DateTime? UpdationTime { get; set; }
     public bool IsDelete { get; set; }
 }
@@ -43,5 +50,7 @@ public enum RentalStatus
 	[Display(Name = "Hoàn thành")]
 	Success =1,
 	[Display(Name = "Hủy")]
-	Cancel =2
+	Cancel =2,
+    [Display(Name = "Quá hạn")]
+    Expired = 3
 }

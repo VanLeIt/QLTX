@@ -5,7 +5,6 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <main>
 	<div class="container-fluid px-4">
 		<h2 class="mt-4">Thêm mới đơn thuê</h2>
@@ -16,7 +15,7 @@
 		<hr />
 		<div class="row">
 			<div class="col-md-8">
-				<form asp-action="Create">
+				<form asp-action="Create" method="post">
 					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 					<div class="mb-3">
@@ -28,7 +27,7 @@
 						<div class="col-md-6 mb-3">
 							<label asp-for="DateRetalFrom" class="control-label mb-2">Ngày bắt đầu thuê</label>
 							<div class="input-group">
-								<input asp-for="DateRetalFrom" class="form-control" id="DateRetalFrom" type="datetime-local" />
+								<input asp-for="DateRetalFrom" class="form-control" id="DateRetalFrom" type="datetime-local"  />
 								<span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
 							</div>
 							<span asp-validation-for="DateRetalFrom" class="text-danger"></span>
@@ -37,24 +36,20 @@
 						<div class="col-md-6 mb-3">
 							<label asp-for="DateRetalTo" class="control-label mb-2">Ngày kết thúc thuê</label>
 							<div class="input-group">
-								<input asp-for="DateRetalTo" class="form-control" id="DateRetalTo" type="datetime-local" />
+								<input asp-for="DateRetalTo" class="form-control" id="DateRetalTo" type="datetime-local"  />
 								<span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
 							</div>
 							<span asp-validation-for="DateRetalTo" class="text-danger"></span>
 						</div>
-					</div>
-
+					</div> 
 					<div class="row">
 						<div class="col-md-6 mb-3">
-
 							<label asp-for="RetalTime" class="control-label mb-2">Thời gian thuê</label>
-							<input asp-for="RetalTime" class="form-control" id="RetalTime" type="text" readonly />
+							<input asp-for="RetalTime" class="form-control" id="RetalTime" readonly />
 							<span asp-validation-for="RetalTime" class="text-danger"></span>
-
 						</div>
 
 						<div class="col-md-6 mb-3">
-
 							<label asp-for="Service" class="control-label mb-2">Dịch vụ thuê</label>
 							<select asp-for="Service" class="form-control" id="Service">
 								<option value="1">Giờ</option>
@@ -62,35 +57,49 @@
 								<option value="3">Tuần</option>
 							</select>
 							<span asp-validation-for="Service" class="text-danger"></span>
-
 						</div>
-					</div> 
-					 
+					</div>
+
 					<div class="row">
-						<div class="col-md-6 mb-3"> 
-								<label asp-for="Price" class="control-label mb-2">Đơn giá</label>
-								<input asp-for="Price" class="form-control" />
-								<span asp-validation-for="Price" class="text-danger"></span>  
+						<div class="col-md-6 mb-3">
+							<label asp-for="Price" class="control-label mb-2">Đơn giá</label>
+							<input asp-for="Price" class="form-control" readonly />
+							<span asp-validation-for="Price" class="text-danger"></span>
 						</div>
 
 						<div class="col-md-6 mb-3">
 							<label asp-for="Total" class="control-label mb-2">Thành tiền</label>
-							<input asp-for="Total" class="form-control" />
-							<span asp-validation-for="Price" class="text-danger"></span>
+							<input asp-for="Total" class="form-control" readonly />
+							<span asp-validation-for="Total" class="text-danger"></span>
 						</div>
 					</div>
-					<div class=" mb-3">
+
+					<div class="mb-3">
 						<label asp-for="Note" class="control-label mb-2">Ghi chú</label>
 						<input asp-for="Note" class="form-control" />
 						<span asp-validation-for="Note" class="text-danger"></span>
 					</div>
-					 
+
 					<div class="mb-3">
-						 
 						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vehicleModal">Chọn xe</button>
-						<input asp-for="EmotorIds" type="hidden" />
+						<input asp-for="EmotorIds" type="hidden" name="EmotorIds" />
 						<div id="selectedVehicles" class="mt-2"></div>
 						<span asp-validation-for="EmotorIds" class="text-danger"></span>
+					</div>
+					<div class="mt-4">
+						<h4>Các xe đã chọn</h4>
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>Loại xe</th>
+									<th>Biển số xe</th>
+									<th>Giá</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody id="selectedVehiclesTableBody">
+							</tbody>
+						</table>
 					</div>
 
 					<div class="form-group d-flex justify-content-between align-items-center">
@@ -101,7 +110,6 @@
 					</div>
 				</form>
 
-				 
 				<div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="vehicleModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-lg">
 						<div class="modal-content">
@@ -119,13 +127,14 @@
 													<img src="@vehicle.ImageUrl" class="card-img-top" alt="@vehicle.License">
 												</div>
 												<div class="card-body">
-													<h5 class="card-title">@vehicle.License</h5>
-													<p class="card-text">@vehicle.VinNumber</p>
-													<button type="button" class="btn btn-primary select-vehicle" data-id="@vehicle.Id" data-license="@vehicle.License">Chọn</button>
+													<h5 class="card-title">@vehicle.TypeMotorbike.Name </h5>
+													<div class="card-text">BKS: @vehicle.License</div>
+													<div class="card-text">VIN: @vehicle.VinNumber</div>
+													<div class="card-text">Giá: @string.Format("{0:0,0} đ/h", @vehicle.TypeMotorbike.Price)</div>
+													<button type="button" class="btn btn-primary select-vehicle" data-id="@vehicle.Id" data-license="@vehicle.License" data-name="@vehicle.TypeMotorbike.Name" data-price="@string.Format("{0:0,0} đ/h", @vehicle.TypeMotorbike.Price)">Chọn</button>
 												</div>
 											</div>
 										</div>
-
 									}
 								</div>
 							</div>
@@ -135,229 +144,355 @@
 						</div>
 					</div>
 				</div>
-				<style>
-					.card-img-container {
-						height: 200px; /* Điều chỉnh chiều cao tùy vào nhu cầu */
-						overflow: hidden;
-						display: flex;
-						align-items: center;
-						justify-content: center;
-					}
 
-					.card-img-top {
-						width: 100%;
-						height: 100%;
-						object-fit: cover;
-					}
-
-					.btn-selected {
-						background-color: gray !important;
-						border-color: gray !important;
-						color: white !important; /* Điều chỉnh màu chữ nếu cần */
-					}
-
-				</style>
-
-				@section Scripts {
-					@{
-						await Html.RenderPartialAsync("_ValidationScriptsPartial");
-					}
-					<script>
-						document.addEventListener('DOMContentLoaded', function () {
-							document.querySelectorAll('.select-vehicle').forEach(button => {
-								button.addEventListener('click', function () {
-									const vehicleId = this.getAttribute('data-id');
-									const vehicleLicense = this.getAttribute('data-license');
-
-									const emotorIdsInput = document.querySelector('input[name="EmotorIds"]');
-									let selectedEmotorIds = emotorIdsInput.value ? emotorIdsInput.value.split(',') : [];
-									if (!selectedEmotorIds.includes(vehicleId)) {
-										selectedEmotorIds.push(vehicleId);
-										emotorIdsInput.value = selectedEmotorIds.join(',');
-
-										const selectedVehiclesDiv = document.getElementById('selectedVehicles');
-										const vehicleElement = document.createElement('div');
-										vehicleElement.textContent = vehicleLicense;
-										selectedVehiclesDiv.appendChild(vehicleElement);
-									}
-								});
-							});
-
-							document.getElementById('DateRetalFrom').addEventListener('change', calculateRentalTime);
-							document.getElementById('DateRetalTo').addEventListener('change', calculateRentalTime);
-							document.getElementById('Service').addEventListener('change', calculateRentalTime);
-						});
-
-						function calculateRentalTime() {
-							var startDateValue = document.getElementById('DateRetalFrom').value;
-							var endDateValue = document.getElementById('DateRetalTo').value;
-							var serviceType = document.getElementById('Service').value;
-
-							if (startDateValue && endDateValue) {
-								var startDate = new Date(startDateValue);
-								var endDate = new Date(endDateValue);
-
-								if (startDate <= endDate) {
-									var timeDiff = endDate - startDate;
-
-									var rentalTime;
-									switch (serviceType) {
-										case '1': // Hours
-											var hoursDiff = Math.ceil(timeDiff / (1000 * 60 * 60));
-											rentalTime = hoursDiff + " giờ";
-											break;
-										case '2': // Days
-											var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-											rentalTime = daysDiff + " ngày";
-											break;
-										case '3': // Weeks
-											var weeksDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24 * 7));
-											rentalTime = weeksDiff + " tuần";
-											break;
-										default:
-											rentalTime = '';
-									}
-
-									document.getElementById('RetalTime').value = rentalTime;
-								} else {
-									document.getElementById('RetalTime').value = '';
-								}
-							} else {
-								document.getElementById('RetalTime').value = '';
-							}
-						}
-
-						function calculateAndDisplayPrice(serviceType, timeDiff) {
- 
-
-							var price;
-							switch (serviceType) {
-								case '1': // Hours
-									price = (timeDiff / (1000 * 60 * 60)) * pricePerHour;
-									break;
-								case '2': // Days
-									price = (timeDiff / (1000 * 60 * 60 * 24)) * pricePerDay;
-									break;
-								case '3': // Weeks
-									price = (timeDiff / (1000 * 60 * 60 * 24 * 7)) * pricePerWeek;
-									break;
-								default:
-									price = 0;
-							} 
-						}
-						$(document).ready(function () {
-							var selectedVehicles = [];  
-
-							$('.select-vehicle').on('click', function () {
-								var vehicleId = $(this).data('id'); 
-								 
-								if (selectedVehicles.includes(vehicleId)) {
-									 
-									var index = selectedVehicles.indexOf(vehicleId);
-									if (index > -1) {
-										selectedVehicles.splice(index, 1); 
-									}
-									$(this).removeClass('btn-selected').addClass('btn-primary').text('Chọn');
-								} else {
-									 
-									selectedVehicles.push(vehicleId);
-									$(this).removeClass('btn-primary').addClass('btn-selected').text('Đã chọn');
-								}
-							});
-						});
-
-						function calculateAndDisplayPrice(serviceType, timeDiff) {
-							var pricePerHour = @Model.Config.PriceHour; // Lấy giá trị từ ViewModel hoặc từ bảng Config
-							var pricePerDay = @Model.Config.PriceDay;
-							var pricePerWeek = @Model.Config.PriceWeek;
-
-							var price;
-							switch (serviceType) {
-								case '1': // Hours
-									price = (timeDiff / (1000 * 60 * 60)) * pricePerHour;
-									break;
-								case '2': // Days
-									price = (timeDiff / (1000 * 60 * 60 * 24)) * pricePerDay;
-									break;
-								case '3': // Weeks
-									price = (timeDiff / (1000 * 60 * 60 * 24 * 7)) * pricePerWeek;
-									break;
-								default:
-									price = 0;
-							}
-
-							// Hiển thị giá trị trong input Thành tiền
-							document.getElementById('Total').value = price.toFixed(2);
-
-							function calculateRentalTime() {
-								var startDateValue = document.getElementById('DateRetalFrom').value;
-								var endDateValue = document.getElementById('DateRetalTo').value;
-								var serviceType = document.getElementById('Service').value;
-
-								if (startDateValue && endDateValue) {
-									var startDate = new Date(startDateValue);
-									var endDate = new Date(endDateValue);
-
-									if (startDate <= endDate) {
-										var timeDiff = endDate - startDate;
-
-										var rentalTime;
-										switch (serviceType) {
-											case '1': // Hours
-												var hoursDiff = Math.ceil(timeDiff / (1000 * 60 * 60));
-												rentalTime = hoursDiff + " giờ";
-												break;
-											case '2': // Days
-												var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-												rentalTime = daysDiff + " ngày";
-												break;
-											case '3': // Weeks
-												var weeksDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24 * 7));
-												rentalTime = weeksDiff + " tuần";
-												break;
-											default:
-												rentalTime = '';
-										}
-
-										document.getElementById('RetalTime').value = rentalTime;
-										calculateAndDisplayPrice(serviceType, timeDiff); // Gọi hàm tính toán giá
-									} else {
-										document.getElementById('RetalTime').value = '';
-										document.getElementById('Total').value = '';
-									}
-								} else {
-									document.getElementById('RetalTime').value = '';
-									document.getElementById('Total').value = '';
-								}
-							}
-
-							function calculateAndDisplayPrice(serviceType, timeDiff) {
-								var pricePerHour = @Model.Config.PriceHour; // Lấy giá trị từ ViewModel hoặc từ bảng Config
-								var pricePerDay = @Model.Config.PriceDay;
-								var pricePerWeek = @Model.Config.PriceWeek;
-
-								var price;
-								switch (serviceType) {
-									case '1': // Hours
-										price = (timeDiff / (1000 * 60 * 60)) * pricePerHour;
-										break;
-									case '2': // Days
-										price = (timeDiff / (1000 * 60 * 60 * 24)) * pricePerDay;
-										break;
-									case '3': // Weeks
-										price = (timeDiff / (1000 * 60 * 60 * 24 * 7)) * pricePerWeek;
-										break;
-									default:
-										price = 0;
-								}
-
-								// Hiển thị giá trị trong input Thành tiền
-								document.getElementById('Total').value = price.toFixed(2);
-
-					</script>
-				}
+				<!-- Table for selected vehicles -->
+				
 			</div>
 		</div>
 	</div>
 </main>
 
+<style>
+	.card-img-container {
+		height: 200px;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.card-img-top {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.btn-selected {
+		background-color: gray !important;
+		border-color: gray !important;
+		color: white !important;
+	}
+
+		.btn-selected:hover {
+			background-color: #c82333;
+			border-color: #bd2130;
+		}
+
+	.scoll-y {
+		max-height: 500px;
+		overflow-y: auto;
+	}
+</style>
+ 
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script>
+		// document.addEventListener('DOMContentLoaded', function () {
+		// 	// Lấy đối tượng input
+		// 	const dateRetalFromInput = document.getElementById('DateRetalFrom');
+		// 	const dateRetalToInput = document.getElementById('DateRetalTo');
+
+		// 	// Tạo hàm để lấy thời gian hiện tại và định dạng thành kiểu datetime-local
+		// 	function setCurrentDateTime() {
+		// 		const now = new Date();
+
+		// 		const year = now.getFullYear();
+		// 		const month = String(now.getMonth() + 1).padStart(2, '0');
+		// 		const day = String(now.getDate()).padStart(2, '0');
+		// 		const hours = String(now.getHours()).padStart(2, '0');
+		// 		const minutes = String(now.getMinutes()).padStart(2, '0');
+
+		// 		const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+		// 		dateRetalFromInput.value = formattedDateTime;
+		// 		dateRetalToInput.value = formattedDateTime;
+		// 	}
+
+		// 	// Gọi hàm setCurrentDateTime khi trang được tải
+		// 	setCurrentDateTime();
+
+		// 	// Khai báo selectedVehicles ban đầu
+		// 	let selectedVehicles = [];
+
+		// 	function calculateSelectedVehiclesTotalPrice() {
+		// 		let totalPrice = 0;
+		// 		selectedVehicles.forEach(vehicle => {
+		// 			// Chuẩn bị chuỗi giá tiền để chuyển đổi
+		// 			const priceString = vehicle.price.replace(' đ/h', '').replace('.', '').replace(',', '');
+
+		// 			// Chuyển đổi chuỗi thành số float
+		// 			const price = parseFloat(priceString);
+
+		// 			console.log(`Vehicle price: ${vehicle.price}, Parsed price: ${price}`);
+		// 			totalPrice += price;
+		// 		});
+
+		// 		console.log(`Total price: ${totalPrice}`);
+		// 		return totalPrice; 
+		// 	}
+
+		// 	// Hàm tính toán thời gian thuê và tổng giá khi có sự thay đổi
+		// 	function calculateRentalTimeAndPrice() {
+		// 		const startDateValue = document.getElementById('DateRetalFrom').value;
+		// 		const endDateValue = document.getElementById('DateRetalTo').value;
+		// 		const serviceType = document.getElementById('Service').value;
+
+		// 		if (startDateValue && endDateValue) {
+		// 			const startDate = new Date(startDateValue);
+		// 			const endDate = new Date(endDateValue);
+		// 			let timeDiff = endDate - startDate;
+		// 			//const diffHours = Math.ceil(timeDiff / (1000 * 3600));
+		// 			let price = 0;
+		// 			var rentalTime = 0;
+		// 			switch (parseInt(serviceType)) {
+		// 				case 1: // Giờ 
+		// 					rentalTime = Math.ceil(timeDiff / (1000 * 3600));
+		// 					price = calculateSelectedVehiclesTotalPrice();  
+		// 					break;
+		// 				case 2: // Ngày
+		// 					rentalTime = Math.ceil(timeDiff / (1000 * 3600 * 24));  
+		// 					price = calculateSelectedVehiclesTotalPrice() * 10; 
+		// 					break;
+		// 				case 3: // Tuần
+		// 					rentalTime = Math.ceil(timeDiff / (1000 * 3600 * 24 * 7));  
+		// 					price = calculateSelectedVehiclesTotalPrice() * 10 * 6;  
+		// 					break;
+		// 				default:
+		// 					//diffHours = 0;
+		// 					price = 0;
+		// 					break;
+		// 			}
+		// 			document.getElementById('RetalTime').value = rentalTime;  
+		// 			document.getElementById('Price').value = price;  
+		// 			document.getElementById('Total').value = (price * rentalTime);  
+		// 		}
+		// 	}
+
+			 
+		// 	document.getElementById('DateRetalFrom').addEventListener('change', calculateRentalTimeAndPrice);
+		// 	document.getElementById('DateRetalTo').addEventListener('change', calculateRentalTimeAndPrice);
+		// 	document.getElementById('Service').addEventListener('change', calculateRentalTimeAndPrice);
+
+			 
+		// 	document.addEventListener('click', function (event) {
+		// 		if (event.target.classList.contains('select-vehicle')) {
+		// 			const vehicleId = event.target.getAttribute('data-id');
+		// 			const vehicleLicense = event.target.getAttribute('data-license');
+		// 			const vehicleName = event.target.getAttribute('data-name');
+		// 			const vehiclePrice = event.target.getAttribute('data-price');
+
+		// 			const alreadySelected = selectedVehicles.some(vehicle => vehicle.id === vehicleId);
+
+		// 			if (alreadySelected) {
+		// 				selectedVehicles = selectedVehicles.filter(vehicle => vehicle.id !== vehicleId);
+		// 				event.target.classList.remove('btn-selected');
+		// 				event.target.textContent = 'Chọn';
+		// 			} else {
+		// 				selectedVehicles.push({ id: vehicleId, license: vehicleLicense, name: vehicleName, price: vehiclePrice });
+		// 				event.target.classList.add('btn-selected');
+		// 				event.target.textContent = 'Bỏ chọn';
+		// 			}
+
+		// 			updateSelectedVehiclesTable();
+		// 			calculateRentalTimeAndPrice();  
+		// 		}
+		// 	});
+
+			 
+		// 	function updateSelectedVehiclesTable() {
+		// 		const selectedVehiclesTableBody = document.getElementById('selectedVehiclesTableBody');
+		// 		selectedVehiclesTableBody.innerHTML = '';
+
+		// 		selectedVehicles.forEach(vehicle => {
+		// 			const row = document.createElement('tr');
+		// 			row.innerHTML = `
+		// 					<td>${vehicle.name}</td>
+		// 					<td>${vehicle.license}</td>
+		// 					<td>${vehicle.price}</td>
+		// 					<td><button type="button" class="btn btn-danger remove-vehicle" data-id="${vehicle.id}">Xóa</button></td>
+		// 				`;
+		// 			selectedVehiclesTableBody.appendChild(row);
+		// 		});
+				 
+		// 		const selectedVehiclesInput = document.querySelector('input[name="EmotorIds"]'); 
+		// 		selectedVehiclesInput.value = selectedVehicles.map(vehicle => vehicle.id).join(',');
+				 
+		// 		const removeVehicleButtons = document.querySelectorAll('.remove-vehicle');
+		// 		removeVehicleButtons.forEach(button => {
+		// 			button.addEventListener('click', function () {
+		// 				const vehicleId = this.getAttribute('data-id');
+		// 				selectedVehicles = selectedVehicles.filter(vehicle => vehicle.id !== vehicleId);
+
+						 
+		// 				const selectButton = document.querySelector(`.select-vehicle[data-id="${vehicleId}"]`);
+		// 				selectButton.classList.remove('btn-selected');
+		// 				selectButton.textContent = 'Chọn';
+
+		// 				updateSelectedVehiclesTable();
+		// 				calculateRentalTimeAndPrice();  
+		// 			});
+		// 		});
+		// 	}
+		// });
+
+		document.addEventListener('DOMContentLoaded', function () {
+			const dateRetalFromInput = document.getElementById('DateRetalFrom');
+			const dateRetalToInput = document.getElementById('DateRetalTo');
+			const serviceSelect = document.getElementById('Service');
+			let selectedVehicles = [];
+
+			function setCurrentDateTime() {
+				const now = new Date();
+				const year = now.getFullYear();
+				const month = String(now.getMonth() + 1).padStart(2, '0');
+				const day = String(now.getDate()).padStart(2, '0');
+				const hours = String(now.getHours()).padStart(2, '0');
+				const minutes = String(now.getMinutes()).padStart(2, '0');
+				const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+				dateRetalFromInput.value = formattedDateTime;
+				dateRetalToInput.value = formattedDateTime;
+			}
+
+			setCurrentDateTime();
+
+			function calculateSelectedVehiclesTotalPrice() {
+				let totalPrice = 0;
+				selectedVehicles.forEach(vehicle => {
+					const priceString = vehicle.price.replace(' đ/h', '').replace('.', '').replace(',', '');
+					const price = parseFloat(priceString);
+					totalPrice += price;
+				});
+				return totalPrice;
+			}
+
+			function calculateRentalTimeAndPrice() {
+				const startDateValue = dateRetalFromInput.value;
+				const endDateValue = dateRetalToInput.value;
+				const serviceType = parseInt(serviceSelect.value);
+
+				if (startDateValue && endDateValue) {
+					const startDate = new Date(startDateValue);
+					const endDate = new Date(endDateValue);
+
+					if (endDate < startDate) {
+						alert('Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.');
+						dateRetalToInput.value = startDateValue; // Reset end date to start date
+						return;
+					}
+
+					const timeDiff = endDate - startDate;
+					const diffHours = timeDiff / (1000 * 3600);
+					let rentalTime = 0;
+					let price = 0;
+
+					if (diffHours < 10) {
+						serviceSelect.innerHTML = '<option value="1">Giờ</option>';
+						rentalTime = Math.ceil(diffHours);
+						if (serviceType !== 1) serviceSelect.value = '1';
+					} else if (diffHours < 144) {
+						serviceSelect.innerHTML = '<option value="1">Giờ</option><option value="2">Ngày</option>';
+						if (serviceType === 1) {
+							rentalTime = Math.ceil(diffHours);
+							serviceSelect.value = '1';
+						} else {
+							rentalTime = Math.ceil(diffHours / 24);
+							serviceSelect.value = '2';
+						}
+					} else {
+						serviceSelect.innerHTML = '<option value="1">Giờ</option><option value="2">Ngày</option><option value="3">Tuần</option>';
+						if (serviceType === 1) {
+							rentalTime = Math.ceil(diffHours);
+							serviceSelect.value = '1';
+						} else if (serviceType === 2) {
+							rentalTime = Math.ceil(diffHours / 24);
+							serviceSelect.value = '2';
+						} else {
+							rentalTime = Math.ceil(diffHours / 168);
+							serviceSelect.value = '3';
+						}
+					}
+
+					switch (parseInt(serviceSelect.value)) {
+						case 1: // Giờ
+							price = calculateSelectedVehiclesTotalPrice();
+							break;
+						case 2: // Ngày
+							price = calculateSelectedVehiclesTotalPrice() * 10;
+							break;
+						case 3: // Tuần
+							price = calculateSelectedVehiclesTotalPrice() * 10 * 6;
+							break;
+					}
+
+					document.getElementById('RetalTime').value = rentalTime;
+					document.getElementById('Price').value = price;
+					document.getElementById('Total').value = (price * rentalTime);
+				}
+			}
+
+			dateRetalFromInput.addEventListener('change', calculateRentalTimeAndPrice);
+			dateRetalToInput.addEventListener('change', calculateRentalTimeAndPrice);
+			serviceSelect.addEventListener('change', calculateRentalTimeAndPrice);
+
+			document.addEventListener('click', function (event) {
+				if (event.target.classList.contains('select-vehicle')) {
+					const vehicleId = event.target.getAttribute('data-id');
+					const vehicleLicense = event.target.getAttribute('data-license');
+					const vehicleName = event.target.getAttribute('data-name');
+					const vehiclePrice = event.target.getAttribute('data-price');
+					const alreadySelected = selectedVehicles.some(vehicle => vehicle.id === vehicleId);
+
+					if (alreadySelected) {
+						selectedVehicles = selectedVehicles.filter(vehicle => vehicle.id !== vehicleId);
+						event.target.classList.remove('btn-selected');
+						event.target.textContent = 'Chọn';
+					} else {
+						selectedVehicles.push({ id: vehicleId, license: vehicleLicense, name: vehicleName, price: vehiclePrice });
+						event.target.classList.add('btn-selected');
+						event.target.textContent = 'Bỏ chọn';
+					}
+
+					updateSelectedVehiclesTable();
+					calculateRentalTimeAndPrice();
+				}
+			});
+
+			function updateSelectedVehiclesTable() {
+				const selectedVehiclesTableBody = document.getElementById('selectedVehiclesTableBody');
+				selectedVehiclesTableBody.innerHTML = '';
+
+				selectedVehicles.forEach(vehicle => {
+					const row = document.createElement('tr');
+					row.innerHTML = `
+								<td>${vehicle.name}</td>
+								<td>${vehicle.license}</td>
+								<td>${vehicle.price}</td>
+								<td><button type="button" class="btn btn-danger remove-vehicle" data-id="${vehicle.id}">Xóa</button></td>
+							`;
+					selectedVehiclesTableBody.appendChild(row);
+				});
+
+				const selectedVehiclesInput = document.querySelector('input[name="EmotorIds"]');
+				selectedVehiclesInput.value = selectedVehicles.map(vehicle => vehicle.id).join(',');
+
+				const removeVehicleButtons = document.querySelectorAll('.remove-vehicle');
+				removeVehicleButtons.forEach(button => {
+					button.addEventListener('click', function () {
+						const vehicleId = this.getAttribute('data-id');
+						selectedVehicles = selectedVehicles.filter(vehicle => vehicle.id !== vehicleId);
+
+						const selectButton = document.querySelector(`.select-vehicle[data-id="${vehicleId}"]`);
+						selectButton.classList.remove('btn-selected');
+						selectButton.textContent = 'Chọn';
+
+						updateSelectedVehiclesTable();
+						calculateRentalTimeAndPrice();
+					});
+				});
+			}
+		});
+
+	</script> 
+}

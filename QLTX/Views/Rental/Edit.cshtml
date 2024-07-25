@@ -1,0 +1,183 @@
+﻿@model QLTX.ViewModels.CreateRental // Sử dụng model CreateRental cho việc chỉnh sửa
+<main>
+    <div class="container-fluid px-4">
+        <h2 class="mt-4">Cập nhật đơn thuê</h2>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item active">Đơn thuê xe</li>
+        </ol>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-8">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-group">
+                        <label asp-for="IdCustomer" class="control-label">Khách hàng</label>
+                        <select asp-for="IdCustomer" class="form-control" asp-items="ViewBag.IdCustomer"></select>
+                        <span asp-validation-for="IdCustomer" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DateRetalFrom" class="control-label mb-2">Ngày bắt đầu thuê</label>
+                            <div class="input-group">
+                                <input asp-for="DateRetalFrom" class="form-control" id="DateRetalFrom" type="datetime-local" readonly />
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
+                            <span asp-validation-for="DateRetalFrom" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DateRetalTo" class="control-label mb-2">Ngày kết thúc thuê</label>
+                            <div class="input-group">
+                                <input asp-for="DateRetalTo" class="form-control" id="DateRetalTo" type="datetime-local" />
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
+                            <span asp-validation-for="DateRetalTo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RetalTime" class="control-label mb-2">Thời gian thuê</label>
+                            <input asp-for="RetalTime" class="form-control" id="RetalTime" readonly />
+                            <span asp-validation-for="RetalTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Service" class="control-label mb-2">Dịch vụ thuê</label>
+                            <select asp-for="Service" class="form-control" id="Service">
+                                <option value="1">Giờ</option>
+                                <option value="2">Ngày</option>
+                                <option value="3">Tuần</option>
+                            </select>
+                            <span asp-validation-for="Service" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Price" class="control-label mb-2">Đơn giá</label>
+                            <input asp-for="Price" class="form-control" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Total" class="control-label mb-2">Thành tiền</label>
+                            <input asp-for="Total" class="form-control" readonly />
+                            <span asp-validation-for="Total" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Note" class="control-label mb-2">Ghi chú</label>
+                        <input asp-for="Note" class="form-control" />
+                        <span asp-validation-for="Note" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('DateRetalTo').addEventListener('change', calculateRentalTime);
+        document.getElementById('Service').addEventListener('change', calculateRentalTime);
+
+        $('.select-vehicle').on('click', function () {
+            const vehicleId = $(this).data('id');
+            const vehicleLicense = $(this).data('license');
+
+            const emotorIdsInput = document.querySelector('input[name="EmotorIds"]');
+            let selectedEmotorIds = emotorIdsInput.value ? emotorIdsInput.value.split(',') : [];
+            if (!selectedEmotorIds.includes(vehicleId.toString())) {
+                selectedEmotorIds.push(vehicleId.toString());
+                emotorIdsInput.value = selectedEmotorIds.join(',');
+
+                const selectedVehiclesDiv = document.getElementById('selectedVehicles');
+                const vehicleElement = document.createElement('div');
+                vehicleElement.textContent = vehicleLicense;
+                selectedVehiclesDiv.appendChild(vehicleElement);
+            }
+        });
+    });
+
+    function calculateRentalTime() {
+        var startDateValue = document.getElementById('DateRetalFrom').value;
+        var endDateValue = document.getElementById('DateRetalTo').value;
+        var serviceType = document.getElementById('Service');
+        var priceUnit = document.getElementById('Price').value;
+
+        if (startDateValue && endDateValue) {
+            var startDate = new Date(startDateValue);
+            var endDate = new Date(endDateValue);
+
+            if (endDate < startDate) {
+                alert('Ngày kết thúc thuê phải lớn hơn ngày bắt đầu thuê');
+                document.getElementById('DateRetalTo').value = '';
+                return;
+            }
+
+            var timeDiff = endDate - startDate;
+            var price;
+            var rentalTime = 0;
+
+            serviceType.innerHTML = ''; // Clear the serviceType options
+
+            if (timeDiff < 10 * 3600 * 1000) { // Less than 10 hours
+                serviceType.innerHTML = '<option value="1">Giờ</option>';
+            } else if (timeDiff < 6 * 24 * 3600 * 1000) { // Less than 6 days
+                serviceType.innerHTML = '<option value="1">Giờ</option><option value="2">Ngày</option>';
+            } else { // 6 days or more
+                serviceType.innerHTML = '<option value="1">Giờ</option><option value="2">Ngày</option><option value="3">Tuần</option>';
+            }
+
+            switch (parseInt(serviceType.value)) {
+                case 1: // Hourly
+                    rentalTime = Math.ceil(timeDiff / (1000 * 3600));
+                    price = priceUnit;
+                    break;
+                case 2: // Daily
+                    rentalTime = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    price = (priceUnit * 10);
+                    break;
+                case 3: // Weekly
+                    rentalTime = Math.ceil(timeDiff / (1000 * 3600 * 24 * 7));
+                    price = (priceUnit * 10 * 6);
+                    break;
+                default:
+                    price = 0;
+                    break;
+            }
+            document.getElementById('RetalTime').value = rentalTime;
+            document.getElementById('Price').value = price;
+            document.getElementById('Total').value = (price * rentalTime);
+        }
+    }
+
+    $(document).ready(function () {
+        var selectedVehicles = [];
+        $('.select-vehicle').on('click', function () {
+            var vehicleId = $(this).data('id');
+
+            if (selectedVehicles.includes(vehicleId)) {
+                var index = selectedVehicles.indexOf(vehicleId);
+                if (index > -1) {
+                    selectedVehicles.splice(index, 1);
+                }
+                $(this).removeClass('btn-selected').addClass('btn-primary').text('Chọn');
+            } else {
+                selectedVehicles.push(vehicleId);
+                $(this).removeClass('btn-primary').addClass('btn-selected').text('Đã chọn');
+            }
+        });
+    });
+</script>

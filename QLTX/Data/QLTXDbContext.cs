@@ -21,8 +21,7 @@ public class QLTXDbContext : IdentityDbContext<User, Role, string,
 	public DbSet<Rental> Rentals { get; set; } = default!;
 	public DbSet<RentalDetail> RentalDetails { get; set; } = default!;
 	public DbSet<Customer> Customers { get; set; } = default!;
-	public DbSet<Bill> Bills { get; set; } = default!;
-	public DbSet<Config> Configs { get; set; } = default!;
+	public DbSet<Store> Stores { get; set; } = default!;
 	//public DbSet<Role> Roles { get; set; } = default!;
 	//public DbSet<UserRoles> UserRoles { get; set; } = default!;
 
@@ -38,21 +37,55 @@ public class QLTXDbContext : IdentityDbContext<User, Role, string,
 		modelBuilder.Entity<EMotorbike>()
 			.HasOne<TypeMotorbike>(s => s.TypeMotorbike)
 			.WithMany(g => g.EMotorbikes)
-			.HasForeignKey(s => s.TypeMotorbikeId);
+			.HasForeignKey(s => s.TypeMotorbikeId)
+			
+			;
 
-		modelBuilder.Entity<RentalDetail>()
-		.HasKey(rd => new { rd.EMotorbileId, rd.RentalId });
+        modelBuilder.Entity<EMotorbike>(b =>
+        {
+            b.HasOne(s => s.TypeMotorbike)
+             .WithMany(g => g.EMotorbikes)
+             .HasForeignKey(s => s.TypeMotorbikeId);
 
-        modelBuilder.Entity<RentalDetail>()
-            .HasOne(rd => rd.Rental)
-            .WithMany(r => r.RentlDetails)
-            .HasForeignKey(rd => rd.RentalId);
+            b.HasMany(e => e.RentlDetails)
+             .WithOne(e => e.EMotorbike)
+             .HasForeignKey(ur => ur.EMotorbileId);
+        });
 
-        modelBuilder.Entity<RentalDetail>()
-            .HasOne(rd => rd.EMotorbike)
-            .WithMany()
-            .HasForeignKey(rd => rd.EMotorbileId);
-        /*modelBuilder.Entity<RentalDetail>()
+        // Cấu hình cho Rental
+        modelBuilder.Entity<Rental>(b =>
+        {
+            b.HasMany(e => e.RentlDetails)
+             .WithOne(e => e.Rental)
+             .HasForeignKey(ur => ur.RentalId);
+        });
+
+		modelBuilder.Entity<RentalDetail>(b =>
+		{
+			b.HasKey(rd => new { rd.RentalId, rd.EMotorbileId });
+
+			b.HasOne(rd => rd.Rental)
+			 .WithMany(r => r.RentlDetails)
+			 .HasForeignKey(rd => rd.RentalId);
+
+			b.HasOne(rd => rd.EMotorbike)
+			 .WithMany(e => e.RentlDetails)
+			 .HasForeignKey(rd => rd.EMotorbileId);
+		});
+		//modelBuilder.Entity<RentalDetail>()
+		//.HasKey(rd => new { rd.EMotorbileId, rd.RentalId });
+
+		//      modelBuilder.Entity<RentalDetail>()
+		//          .HasOne(rd => rd.Rental)
+		//          .WithMany(r => r.RentlDetails)
+		//          .HasForeignKey(rd => rd.RentalId);
+
+		//      modelBuilder.Entity<RentalDetail>()
+		//          .HasOne(rd => rd.EMotorbike)
+		//          .WithMany()
+		//          .HasForeignKey(rd => rd.EMotorbileId);
+
+		/*modelBuilder.Entity<RentalDetail>()
 			.HasOne(rd => rd.EMotorbike)
 			.WithMany()
 			.HasForeignKey(rd => rd.EMotorbileId);

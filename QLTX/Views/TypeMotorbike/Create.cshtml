@@ -17,8 +17,7 @@
 			<div class="col-md-4">
 				<form asp-action="Create">
 					<div asp-validation-summary="ModelOnly" class="text-danger"></div> 
-					<div class="mb-3">
-
+					<div class="mb-3"> 
 						<label asp-for="Name" class="control-label mb-2">Tên loại xe</label>
 						<input asp-for="Name" class="form-control" />
 						<span asp-validation-for="Name" class="text-danger"></span>
@@ -37,15 +36,21 @@
 					</div>
 					<div class="mb-3">
 
-						<label asp-for="Battery" class="control-label mb-2">Thời lượng pin</label>
-						<input asp-for="Battery" class="form-control" />
-						<span asp-validation-for="Battery" class="text-danger"></span>
+						<label asp-for="Distance" class="control-label mb-2">Quãng đường</label>
+						<input asp-for="Distance" class="form-control" />
+						<span asp-validation-for="Distance" class="text-danger"></span>
 					</div>
 					<div class="mb-3">
 
 						<label asp-for="Charging" class="control-label mb-2">Thời gian sạc</label>
 						<input asp-for="Charging" class="form-control" />
 						<span asp-validation-for="Charging" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+
+						<label asp-for="Price" class="control-label mb-2">Giá thuê theo giờ</label>
+						<input asp-for="Price" class="form-control" />
+						<span asp-validation-for="Price" class="text-danger"></span>
 					</div>
 					<div class="mb-3">
 						<label asp-for="CompanyId" class="control-label mb-2">Hãng xe</label>

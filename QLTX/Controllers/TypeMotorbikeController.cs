@@ -58,7 +58,7 @@ public class TypeMotorbikeController : Controller
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
-	public async Task<IActionResult> Create([Bind("Id,Name,Power,Speed,Battery,Charging,CompanyId,Description ")] TypeMotorbike typeMotorbikes)
+	public async Task<IActionResult> Create([Bind("Id,Name,Power,Speed,Distance,Price,Charging,CompanyId,Description ")] TypeMotorbike typeMotorbikes)
 	{
 		if (TypeMotorbikeExists(typeMotorbikes.Name))
 		{
@@ -107,7 +107,7 @@ public class TypeMotorbikeController : Controller
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Power,Speed,Battery,Charging,CompanyId,Description")] TypeMotorbike typeMotorbikes)
+	public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Power,Speed,Distance,Price,Charging,CompanyId,Description")] TypeMotorbike typeMotorbikes)
 	{
 		if (id != typeMotorbikes.Id)
 		{

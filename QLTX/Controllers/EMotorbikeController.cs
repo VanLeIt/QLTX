@@ -251,7 +251,43 @@ public class EMotorbikeController : Controller
         return Json(result);
     }
 
-    private bool EMotorbikeExists(int id)
+    public async Task<JsonResult> ChangBroken(int id)
+    {
+        bool result = false;
+        // var emotor = _context.EMotorbikes.Find(id);
+        var emotor = _context.EMotorbikes.Find(id);
+        //var emotor = _context.RentalDetails.Where(a => a.RentalId == id).ToList();
+        if (emotor != null)
+        {
+            result = true;
+
+            emotor.Status = EMotorbikeStatus.Broken;
+             
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Đã báo hỏng xe.";
+        }
+        return Json(result);
+    }
+
+	public async Task<JsonResult> ChangReady(int id)
+	{
+		bool result = false;
+		// var emotor = _context.EMotorbikes.Find(id);
+		var emotor = _context.EMotorbikes.Find(id);
+		//var emotor = _context.RentalDetails.Where(a => a.RentalId == id).ToList();
+		if (emotor != null)
+		{
+			result = true;
+
+			emotor.Status = EMotorbikeStatus.Ready;
+
+			_context.SaveChanges();
+			TempData["SuccessMessage"] = "Đã phục hồi xe hỏng.";
+		}
+		return Json(result);
+	}
+
+	private bool EMotorbikeExists(int id)
     {
         return (_context.EMotorbikes?.Any(e => e.Id == id)).GetValueOrDefault();
     }

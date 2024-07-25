@@ -4,6 +4,7 @@
 	ViewData["Title"] = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	int index = 0;
+
 }
 
 
@@ -44,7 +45,10 @@
 								Tốc độ
 							</th>
 							<th>
-								Thời lượng pin
+								Quãng đường
+							</th>
+							<th>
+								Giá thuê theo giờ
 							</th>
 							<th>
 								Thời gian sạc
@@ -77,7 +81,10 @@
 										@item.Speed
 									</td>
 									<td>
-										@item.Battery
+										@item.Distance
+									</td>
+									<td>
+										@string.Format("{0:0,0} đ", item.Price)
 									</td>
 									<td style="text-align:center;">
 										@item.Charging
