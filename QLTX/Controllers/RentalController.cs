@@ -114,6 +114,7 @@ public class RentalController : Controller
                 Price = viewModel.Price,
                 Total = viewModel.Total,
                 Note = viewModel.Note,
+                //LateFee = viewModel.LateFee,
                 CreatedBy = User.Identity.Name,
                 CreationTime = DateTime.Now,
                 IsDelete = false
@@ -181,7 +182,7 @@ public class RentalController : Controller
 	}
 
 	[HttpPost]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,DateRetalFrom,DateRetalTo,RetalTime,Status,Service,Note")] CreateRental rental)
+    public async Task<IActionResult> Edit(int id, /*[Bind("Id,DateRetalFrom,DateRetalTo,RetalTime,Status,Service,Note")]*/ CreateRental rental)
     {
         if (id != rental.Id)
         {
@@ -205,6 +206,8 @@ public class RentalController : Controller
                 originalRental.RetalTime = rental.RetalTime;
                 originalRental.Note = rental.Note;
                 originalRental.UpdatedBy = User.Identity.Name;
+                originalRental.Price = rental.Price;
+                originalRental.Total = rental.Total;
                 originalRental.UpdationTime = DateTime.Now;
                 if(rental.DateRetalTo > DateTime.Now)
                 {
@@ -287,8 +290,17 @@ public class RentalController : Controller
 		{
 			result = true;
 
-			rentalStatus.Status = RentalStatus.Success;
-			foreach (var detail in emotor)
+			
+            if (rentalStatus.Status == RentalStatus.Expired)
+            {
+                TimeSpan overdueTime = DateTime.Now - rentalStatus.DateRetalTo;
+                float totalHours = (float)Math.Ceiling(overdueTime.TotalHours);
+                 rentalStatus.LateFee = (float?)(totalHours * 1.5 * rentalStatus.Price);
+                
+            }
+            rentalStatus.Total = (float)(rentalStatus.Total + rentalStatus.LateFee);
+            rentalStatus.Status = RentalStatus.Success;
+            foreach (var detail in emotor)
 			{
 				var emoto = _context.EMotorbikes.Find(detail.EMotorbileId);
 				if (emoto != null)

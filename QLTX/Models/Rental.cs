@@ -18,9 +18,10 @@ public class Rental
 	//public double KmEnd { get; set; }
 	public RentalStatus Status { get; set; } = RentalStatus.Renting;
 	public virtual ICollection<RentalDetail> RentlDetails { get; set; } 
-	//public int IdEmotor { get; set; }
-	//public EMotorbike EMotorbike { get; set; }
-	public float Total { get; set; }
+    public float? LateFee { get; set; }
+    //public int IdEmotor { get; set; }
+    //public EMotorbike EMotorbike { get; set; }
+    public float Total { get; set; }
 
     [StringLength(255)]
     public string? Note { get; set; }

@@ -19,6 +19,7 @@ public class CreateRental
  /*   public double KmStart { get; set; }
     public double KmEnd { get; set; }*/
     public float Price { get; set; }
+    public float? LateFee { get; set; }
     public string? EmotorIds { get; set; }
     public RentalStatus Status { get; set; } = RentalStatus.Renting;
     public float Total { get; set; }

@@ -17,6 +17,8 @@
         }
         <p>
             <a asp-action="Create" class="btn btn-primary">Thêm mới</a>
+            
+        </p>
         </p>
         <div class="card mb-4">
             <div class="card-header">
@@ -80,22 +82,13 @@
                                         break;
                                 }
 
-                               @*  TimeSpan? overdueTime = null;
-                                if (item.Status == RentalStatus.Expired)
-                                {
-                                    overdueTime = DateTime.Now - item.DateRetalTo;
-                                } *@
+                                
                                 TimeSpan? overdueTime = null;
                                 if (item.Status == RentalStatus.Expired)
                                 {
                                     overdueTime = DateTime.Now - item.DateRetalTo;
 
-                                    // Calculate late fee
-                                    if (overdueTime.HasValue)
-                                    {
-                                        int totalMinutes = (int)overdueTime.Value.TotalMinutes;
-                                        lateFee = (totalMinutes / 30) * 5000; // 5,000 đ per 30 minutes
-                                    }
+                                    
                                 }
 
                                 <tr>
@@ -105,10 +98,7 @@
                                     <td>@item.DateRetalTo.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td>@item.RetalTime @serviceText</td>
                                     <td>
-                                        @string.Format("{0:0,0} đ", item.Total) @if (lateFee > 0)
-                                        {
-                                            <span>+ @string.Format("{0:0,0} đ", lateFee) </span>
-                                        }
+                                        @string.Format("{0:0,0} đ", item.Total /* + (item.LateFee.HasValue ? item.LateFee : 0) */  )  
                                     </td>
                                     <td class="text-center">
                                         <span class="px-2 py-1 rounded text-white @statusClass">
@@ -146,7 +136,7 @@
                                         <a asp-action="Details" asp-route-id="@item.Id" class="text-info" style="margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
                                         <a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"><i class="fas fa-trash-alt fa-lg"></i></a>
 
-                                        @if (item.Status == RentalStatus.Renting)
+                                        @if (item.Status == RentalStatus.Renting || (DateTime.Now - item.DateRetalFrom).TotalMinutes < 15)
                                         {
                                             <a href="javascript:void(0)" onclick="CancelRental(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Hủy"><i class="fas fa-times fa-lg"></i></a>
                                         }
@@ -234,6 +224,7 @@
                 success: function (response) {
                     if (response) {
                         window.location.reload();
+
                     } else {
                         alert('Đã xảy ra lỗi khi hoàn thành đơn thuê.');
                     }
@@ -265,6 +256,7 @@
                 success: function (response) {
                     if (response) {
                         window.location.reload();
+
                     } else {
                         alert('Đã xảy ra lỗi khi xóa mục này.');
                     }

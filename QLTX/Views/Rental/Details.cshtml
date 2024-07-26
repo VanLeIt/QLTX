@@ -6,7 +6,7 @@
     int index = 1;
     var serviceText = "";
     var overdueTime = TimeSpan.Zero;
-    var lateFee = 0;
+    float lateFee = 0;
     
     switch (Model.Service)
     {
@@ -32,8 +32,10 @@
             overdueTime = now - Model.DateRetalTo;
 
             // Calculate late fee
-            var totalMinutes = (int)overdueTime.TotalMinutes;
-            lateFee = (totalMinutes / 30) * 5000; // 5,000 đ per 30 minutes
+            float totalMinutes = (float)Math.Ceiling(overdueTime.TotalHours);
+            // rentalStatus.LateFee = (float?)(totalHours * 1.5 * rentalStatus.Price);
+            // var totalMinutes = (float)overdueTime.TotalHours;
+            lateFee = (float)(totalMinutes * 1.5 * Model.Price);
         }
     }
 }
@@ -114,6 +116,15 @@
                     @string.Format("{0:0,0} đ", lateFee)
                 </dd>
             }
+            @if(Model.LateFee > 0)
+            {
+                <dt class="col-sm-2">
+                    Phí quá hạn
+                </dt>
+                <dd class="col-sm-10">
+                    @string.Format("{0:0,0} đ", Model.LateFee)
+                </dd>
+            }
             <dt class="col-sm-2">
                 Đơn giá trung bình
             </dt>
@@ -183,9 +194,20 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-2">
+            @if(Model.Status == RentalStatus.Success)
+            {
+                <div class="col-sm-2">
+                    <input type="button" value="Xuất đơn thuê" class="btn btn-warning" onclick="window.print()" />
+                </div>
+            }
+            else
+            {
+                <div class="col-sm-2">
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Cập nhật</a>
             </div>
+            }
+            
+            
             <div class="col-sm-10">
                 <a asp-action="Index" class="btn btn-secondary">Đóng</a>
             </div>
