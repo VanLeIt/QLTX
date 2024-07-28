@@ -10,18 +10,21 @@ public class Rental
 	public Customer Customer { get; set; }
 
 	public DateTime DateRetalFrom { get; set; }
-	public DateTime DateRetalTo { get; set; }
-	public float? RetalTime { get; set; }
+	public DateTime DateRetalTo { get; set; } 
+    public float? RetalTime { get; set; }
 	public RentalService Service {  get; set; }
 	public float Price {  get; set; } 
-	//public double KmStart { get; set; }
-	//public double KmEnd { get; set; }
 	public RentalStatus Status { get; set; } = RentalStatus.Renting;
-	public virtual ICollection<RentalDetail> RentlDetails { get; set; } 
+	public virtual ICollection<RentalDetail> RentlDetails { get; set; }
+    public DateTime? DateExpired { get; set; }
+	[StringLength(50)]
+	public string? ExpiredTime { get; set; }
     public float? LateFee { get; set; }
-    //public int IdEmotor { get; set; }
-    //public EMotorbike EMotorbike { get; set; }
     public float Total { get; set; }
+    [StringLength(500)]
+    public string? DetailBroken { get; set; }
+    public float? TotalBroken { get; set; }
+    public float SumTotal { get; set; }
 
     [StringLength(255)]
     public string? Note { get; set; }

@@ -1,0 +1,11 @@
+﻿body {
+}
+@media print {
+    .print-hidden {
+        display: none;
+    }
+    /* Optional: Adjust the layout for printing */
+    .container-fluid {
+        padding: 0;
+    }
+}

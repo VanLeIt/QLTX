@@ -43,7 +43,7 @@ namespace QLTX.Controllers
                 PhoneNumber = storeInfo.PhoneNumber,
                 eMotorReady = countEmotorReady,
                 eMotorRenting = countEmotoRenting,
-                 eMotor = countEmoto,
+                eMotor = countEmoto,
                 renting = countRenting,
                 rentalSuccess = countRentSuccess
 

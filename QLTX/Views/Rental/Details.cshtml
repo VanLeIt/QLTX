@@ -1,252 +1,335 @@
 ﻿@model QLTX.Models.Rental
-
 @{
-    ViewData["Title"] = "Chi tiết đơn thuê";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    int index = 1;
-    var serviceText = "";
-    var overdueTime = TimeSpan.Zero;
-    float lateFee = 0;
-    
-    switch (Model.Service)
-    {
-        case RentalService.Hour:
+	ViewData["Title"] = "Chi tiết đơn thuê";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	int index = 1;
+	var serviceText = "";
+	var overdueTime = TimeSpan.Zero;
+	float lateFee = 0;
 
-            serviceText = "Giờ";
-            break;
-        case RentalService.Day:
+	switch (Model.Service)
+	{
+		case RentalService.Hour:
+			serviceText = "Giờ";
+			break;
+		case RentalService.Day:
+			serviceText = "Ngày";
+			break;
+		case RentalService.Week:
+			serviceText = "Tuần";
+			break;
+	}
 
-            serviceText = "Ngày";
-            break;
-        case RentalService.Week:
+	if (Model.Status == RentalStatus.Expired)
+	{
+		var now = DateTime.Now;
+		if (now > Model.DateRetalTo)
+		{
+			overdueTime = now - Model.DateRetalTo;
 
-            serviceText = "Tuần";
-            break;
-    }
-     
-    if (Model.Status == RentalStatus.Expired)
-    {
-        var now = DateTime.Now;
-        if (now > Model.DateRetalTo)
-        {
-            overdueTime = now - Model.DateRetalTo;
+			float totalHours = (float)overdueTime.TotalHours;
+			float totalDays = (float)overdueTime.TotalDays;
+			float totalWeeks = totalDays / 7;
 
-            // Calculate late fee
-            float totalMinutes = (float)Math.Ceiling(overdueTime.TotalHours);
-            // rentalStatus.LateFee = (float?)(totalHours * 1.5 * rentalStatus.Price);
-            // var totalMinutes = (float)overdueTime.TotalHours;
-            lateFee = (float)(totalMinutes * 1.5 * Model.Price);
-        }
-    }
+			if (Model.Service == RentalService.Hour)
+			{
+				if (totalHours < 10)
+				{
+					lateFee = totalHours * 1.5f * Model.Price;
+				}
+				else if (totalHours < 144)
+				{
+					lateFee = Model.Price * 10 * 1.5f * totalDays;
+				}
+				else
+				{
+					lateFee = Model.Price * 10 * 6 * 1.5f * totalWeeks;
+				}
+			}
+			else if (Model.Service == RentalService.Day)
+			{
+				if (totalHours < 10)
+				{
+					lateFee = totalHours * 1.5f * (Model.Price / 10);
+				}
+				else if (totalHours < 144)
+				{
+					lateFee = Model.Price * 1.5f * totalDays;
+				}
+				else
+				{
+					lateFee = Model.Price * 6 * 1.5f * totalWeeks;
+				}
+			}
+			else if (Model.Service == RentalService.Week)
+			{
+				if (totalHours < 10)
+				{
+					lateFee = totalHours * 1.5f * (Model.Price / 10 / 6);
+				}
+				else if (totalHours < 144)
+				{
+					lateFee = (Model.Price / 6) * 1.5f * totalDays;
+				}
+				else
+				{
+					lateFee = Model.Price * 1.5f * totalWeeks;
+				}
+			}
+		}
+	}
+
+	float RoundToNearest(float amount, float nearest)
+	{
+		return (float)(Math.Round(amount / nearest) * nearest);
+	}
 }
 
 <main>
-    <div class="container-fluid px-4">
-        <h2 class="mt-4">Chi tiết đơn thuê</h2>
-        <hr />
-        <dl class="row">
-            <dt class="col-sm-2">
-                Khách hàng
-            </dt>
-            <dd class="col-sm-10">
-                @Model.Customer.Name - @Model.Customer.IdDocument
-            </dd>
-            <dt class="col-sm-2">
-                Ngày thuê
-            </dt>
-            <dd class="col-sm-10">
-                @Model.DateRetalFrom.ToString("dd/MM/yyyy HH:mm")
-            </dd>
-            <dt class="col-sm-2">
-                Ngày trả
-            </dt>
-            <dd class="col-sm-10">
-                @Model.DateRetalTo.ToString("dd/MM/yyyy HH:mm")
-            </dd>
-            <dt class="col-sm-2">
-                Thời gian thuê 
-            </dt>
-            <dd class="col-sm-10">
-                @Model.RetalTime @serviceText
-            </dd>
-            <dt class="col-sm-2">
-                Trạng thái
-            </dt>
-            <dd class="col-sm-10">
-                @if (Model.Status == RentalStatus.Renting)
-                {
-                    <span class="bg-warning">Đang thuê</span>
-                }
-                else if (Model.Status == RentalStatus.Success)
-                {
-                    <span class="bg-success">Hoàn thành</span>
-                }
-                else if (Model.Status == RentalStatus.Cancel)
-                {
-                    <span class="bg-secondary">Hủy</span>
-                }
-                else if (Model.Status == RentalStatus.Expired)
-                {
-                    <span class="bg-danger">Quá hạn</span>
-                }
-            </dd>
-            @if (overdueTime > TimeSpan.Zero)
-            {
-                <dt class="col-sm-2">
-                    Thời gian quá hạn
-                </dt>
-                <dd class="col-sm-10">
-                    @if (overdueTime.TotalMinutes < 60)
-                    {
-                        @($"{overdueTime.Minutes} phút")
-                    }
-                    else if (overdueTime.TotalHours < 24)
-                    {
-                        @($"{overdueTime.Hours} giờ, {overdueTime.Minutes} phút")
-                    }
-                    else
-                    {
-                        @($"{overdueTime.Days} ngày, {overdueTime.Hours % 24} giờ, {overdueTime.Minutes} phút")
-                    }
-                </dd>
-                <dt class="col-sm-2">
-                    Phí quá hạn
-                </dt>
-                <dd class="col-sm-10">
-                    @string.Format("{0:0,0} đ", lateFee)
-                </dd>
-            }
-            @if(Model.LateFee > 0)
-            {
-                <dt class="col-sm-2">
-                    Phí quá hạn
-                </dt>
-                <dd class="col-sm-10">
-                    @string.Format("{0:0,0} đ", Model.LateFee)
-                </dd>
-            }
-            <dt class="col-sm-2">
-                Đơn giá trung bình
-            </dt>
-            <dd class="col-sm-10">
-                @string.Format("{0:0,0} đ", @Model.Price)
-            </dd>
-            <dt class="col-sm-2">
-                Thành tiền
-            </dt>
-            <dd class="col-sm-10">
-                @string.Format("{0:0,0} đ", @Model.Total)
-            </dd>
-           
-            @if (Model.Note is not null)
-            {
-                <dt class="col-sm-2">
-                Ghi chú
-            </dt>
-            <dd class="col-sm-10">
-                @Model.Note
-            </dd>
-            }
-            
-            <dt class="col-sm-2">
-                Tạo bởi
-            </dt>
-            <dd class="col-sm-10">
-                @Model.CreatedBy - @Model.CreationTime.ToString("dd/MM/yyyy HH:mm")
-            </dd>
-            @if (!string.IsNullOrEmpty(Model.UpdatedBy))
-            {
-                <dt class="col-sm-2">
-                    Cập nhật lần cuối bởi
-                </dt>
-                <dd class="col-sm-10">
-                    @Model.UpdatedBy - @Model.UpdationTime?.ToString("dd/MM/yyyy HH:mm")
-                </dd>
-            }
-        </dl>
+	<div class="container-fluid px-4">
+		<h2 class="mt-4">Chi tiết đơn thuê</h2>
+		<hr />
+		<div class="row">
+			<div class="col-md-6">
+		<dl class="row">
+			<dt class="col-sm-4">
+				Khách hàng
+			</dt>
+			<dd class="col-sm-8">
+				@Model.Customer.Name - @Model.Customer.IdDocument
+			</dd>
+			<dt class="col-sm-4">
+				Ngày thuê
+			</dt>
+			<dd class="col-sm-8">
+				@Model.DateRetalFrom.ToString("dd/MM/yyyy HH:mm")
+			</dd>
+			<dt class="col-sm-4">
+				Ngày trả
+			</dt>
+			<dd class="col-sm-8">
+				@Model.DateRetalTo.ToString("dd/MM/yyyy HH:mm")
+			</dd>
+			<dt class="col-sm-4">
+				Thời gian thuê
+			</dt>
+					<dd class="col-sm-8">
+				@Model.RetalTime @serviceText
+			</dd>
+			<dt class="col-sm-4">
+				Trạng thái
+			</dt>
+					<dd class="col-sm-8">
+				@if (Model.Status == RentalStatus.Renting)
+				{
+					<span class="bg-warning">Đang thuê</span>
+				}
+				else if (Model.Status == RentalStatus.Success)
+				{
+					<span class="bg-success">Hoàn thành</span>
+				}
+				else if (Model.Status == RentalStatus.Cancel)
+				{
+					<span class="bg-secondary">Hủy</span>
+				}
+				else if (Model.Status == RentalStatus.Expired)
+				{
+					<span class="bg-danger">Quá hạn</span>
+				}
+			</dd>
+			@if (overdueTime > TimeSpan.Zero)
+			{
+				<dt class="col-sm-4">
+					Thời gian quá hạn
+				</dt>
+						<dd class="col-sm-8">
+					@if (overdueTime.TotalMinutes < 60)
+					{
+						@($"{overdueTime.Minutes} phút")
+					}
+					else if (overdueTime.TotalHours < 24)
+					{
+						@($"{overdueTime.Hours} giờ, {overdueTime.Minutes} phút")
+					}
+					else
+					{
+						@($"{overdueTime.Days} ngày, {overdueTime.Hours % 24} giờ, {overdueTime.Minutes} phút")
+					}
+				</dd>
+				 
+			}
+			
+			<dt class="col-sm-4">
+				Đơn giá trung bình
+			</dt>
+					<dd class="col-sm-8">
+				@string.Format("{0:0,0} đ", @Model.Price)
+			</dd>
+			<dt class="col-sm-4">
+				Thành tiền dự kiến
+			</dt>
+					<dd class="col-sm-8">
+				@string.Format("{0:0,0} đ", @Model.Total)
+			</dd>
+			@if (Model.SumTotal > 0)
+			{
+				<dt class="col-sm-4">
+					Tổng tiền
+				</dt>
+						<dd class="col-sm-8">
+					@string.Format("{0:0,0} đ", @Model.SumTotal)
+				</dd>
+			}
 
-        <h3 class="mt-4">Danh sách xe thuê</h3>
-        <div class="card mb-4">
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Biển số xe</th>
-                            <th>VIN</th>
-                            <th>Giá thuê</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var detail in Model.RentlDetails)
-                        {  
-                            <tr>
-                                <td>@index</td>
-                                <td>@(detail.EMotorbike.License)</td>
-                                <td>@(detail.EMotorbike.VinNumber)</td>
-                                <td>@string.Format("{0:0,0} đ/h", (detail.EMotorbike.TypeMotorbike.Price))</td>
-                            </tr>
-                            index++;
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <div class="row">
-            @if(Model.Status == RentalStatus.Success)
-            {
-                <div class="col-sm-2">
-                    <input type="button" value="Xuất đơn thuê" class="btn btn-warning" onclick="window.print()" />
-                </div>
-            }
-            else
-            {
-                <div class="col-sm-2">
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Cập nhật</a>
-            </div>
-            }
-            
-            
-            <div class="col-sm-10">
-                <a asp-action="Index" class="btn btn-secondary">Đóng</a>
-            </div>
-        </div>
-    </div>
+			@if (Model.Note is not null)
+			{
+				<dt class="col-sm-4">
+					Ghi chú
+				</dt>
+						<dd class="col-sm-8">
+					@Model.Note
+				</dd>
+			}
+
+			<dt class="col-sm-4">
+				Tạo bởi
+			</dt>
+					<dd class="col-sm-8">
+				@Model.CreatedBy - @Model.CreationTime.ToString("dd/MM/yyyy HH:mm")
+			</dd>
+			@if (!string.IsNullOrEmpty(Model.UpdatedBy))
+			{
+				<dt class="col-sm-4">
+					Cập nhật lần cuối bởi
+				</dt>
+						<dd class="col-sm-8">
+					@Model.UpdatedBy - @Model.UpdationTime?.ToString("dd/MM/yyyy HH:mm")
+				</dd>
+			}
+		</dl>
+		</div>
+
+			<div class="col-md-6">
+				<dl class="row">
+					@if (Model.LateFee > 0)
+					{
+						<dt class="col-sm-4">
+							Thời gian quá hạn
+						</dt>
+						<dd class="col-sm-8">
+							@Model.DateExpired?.ToString("dd/MM/yyyy HH:mm") ( @Model.ExpiredTime)
+						</dd>
+						<dt class="col-sm-4">
+							Phí quá hạn
+						</dt>
+						<dd class="col-sm-8">
+							@string.Format("{0:0,0} đ", Model.LateFee)
+						</dd>
+					}
+					@if (Model.TotalBroken > 0)
+					{
+						<dt class="col-sm-4">
+							Chi tiết xe hỏng
+						</dt>
+						<dd class="col-sm-8">
+							@Model.DetailBroken
+						</dd>
+						<dt class="col-sm-4">
+							Phí bồi thường hỏng xe
+						</dt>
+						<dd class="col-sm-8">
+							@string.Format("{0:0,0} đ", Model.TotalBroken)
+						</dd>
+					}
+					 
+				</dl>
+			</div>
+		</div>
+
+		<h3 class="mt-4">Danh sách xe thuê</h3>
+		<div class="card mb-4">
+			<div class="card-body">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>STT</th>
+							<th>Biển số xe</th>
+							<th>VIN</th>
+							<th>Giá thuê</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var detail in Model.RentlDetails)
+						{
+							<tr>
+								<td>@index</td>
+								<td>@(detail.EMotorbike.License)</td>
+								<td>@(detail.EMotorbike.VinNumber)</td>
+								<td>@string.Format("{0:0,0} đ/h", (detail.EMotorbike.TypeMotorbike.Price))</td>
+							</tr>
+							index++;
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="row print-hidden">
+			@if (Model.Status == RentalStatus.Success)
+			{
+				<div class="col-sm-5">
+					<button class="btn btn-warning" onclick="window.print()">
+						<i class="fas fa-print"></i> Xuất hóa đơn
+					</button>
+				</div>
+			}
+			 
+
+
+			<div class="col-sm-5">
+				<a asp-action="Index" class="btn btn-secondary">Đóng</a>
+			</div>
+		</div>
+	</div>
 </main>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 }
 <style>
-    .bg-warning {
-        background-color: #ffc107;  
-        color: white;  
-        border-radius: 5px;
-        padding: 3px
-    }
+	.bg-warning {
+		background-color: #ffc107;
+		color: white;
+		border-radius: 5px;
+		padding: 3px
+	}
 
-    .bg-success {
-        background-color: #28a745;  
-        color: white; 
-        border-radius: 5px;
-        padding: 3px
-    }
+	.bg-success {
+		background-color: #28a745;
+		color: white;
+		border-radius: 5px;
+		padding: 3px
+	}
 
-    
-    .bg-danger {
-        background-color: #dc3545;  
-        color: white;  
-        border-radius: 5px;
-        padding: 3px
-    }
 
-    .bg-secondary {
-        background-color: #6C757D;  
-        color: white; 
-        border-radius: 5px;
-        padding: 3px
-    }
+	.bg-danger {
+		background-color: #dc3545;
+		color: white;
+		border-radius: 5px;
+		padding: 3px
+	}
+
+	.bg-secondary {
+		background-color: #6C757D;
+		color: white;
+		border-radius: 5px;
+		padding: 3px
+	}
+
+	dt {
+		text-align: left;
+	}
 </style>

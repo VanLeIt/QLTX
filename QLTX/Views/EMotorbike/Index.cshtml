@@ -125,14 +125,12 @@
 
 										 
 										<a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"><i class="fas fa-trash-alt fa-lg"></i></a>
-
-										@if (item.Status == EMotorbikeStatus.Ready)
+										 
+										@if (item.Status != EMotorbikeStatus.Renting)
 										{
-											<a href="javascript:void(0)" onclick="BrokenMotor(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Báo hỏng xe"><i class="fas fa-times fa-lg"></i></a>
-										}
-										@if (item.Status == EMotorbikeStatus.Broken)
-										{
-											<a href="javascript:void(0)" onclick="ReadyMotor(@item.Id)" class="text-success" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="Xe đã sửa"><i class="fas fa-check-circle fa-lg"></i></a>
+											<a href="#" onclick="BrokenMotor(@item.Id)" class="text-@(item.Status == EMotorbikeStatus.Ready ? "danger" : "success")" style="margin-right:5px" data-bs-toggle="tooltip" data-bs-placement="top" title="@(item.Status == EMotorbikeStatus.Ready ? "Chuyển xe hỏng" : "Chuyển xe sẵn sàng")">
+												<i class="fas fa-@(item.Status == EMotorbikeStatus.Ready ? "exclamation-triangle" : "check-circle") fa-lg" style="font-size: 1.5em;"></i>
+											</a>
 										}
 									</td>
 								</tr>
@@ -194,9 +192,11 @@
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
 	<script>
+		 
+
 		function BrokenMotor(id) {
 			$.ajax({
-				url: '/EMotorbike/ChangBroken/' + id,
+				url: '/EMotorbike/ChangStatus/' + id,
 				type: 'POST',
 				success: function (response) {
 					if (response) {

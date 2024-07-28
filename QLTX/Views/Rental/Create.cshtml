@@ -254,17 +254,14 @@
 							serviceSelect.value = '2';
 						}
 					} else {
-						serviceSelect.innerHTML = '<option value="1">Giờ</option><option value="2">Ngày</option><option value="3">Tuần</option>';
-						if (serviceType === 1) {
-							rentalTime = Math.ceil(diffHours);
-							serviceSelect.value = '1';
+						serviceSelect.innerHTML = '<option value="2">Ngày</option><option value="3">Tuần</option>';
+						if (serviceType === 3) {
+							rentalTime = Math.ceil(diffHours / 168);
+							serviceSelect.value = '3';
 						} else if (serviceType === 2) {
 							rentalTime = Math.ceil(diffHours / 24);
 							serviceSelect.value = '2';
-						} else {
-							rentalTime = Math.ceil(diffHours / 168);
-							serviceSelect.value = '3';
-						}
+						} 
 					}
 
 					switch (parseInt(serviceSelect.value)) {

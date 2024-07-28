@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using QLTX.Models;
 
 namespace QLTX.ViewModels;
@@ -16,8 +17,12 @@ public class CreateRental
     public DateTime DateRetalTo { get; set; }
     public float? RetalTime { get; set; }
     public RentalService Service { get; set; }
- /*   public double KmStart { get; set; }
-    public double KmEnd { get; set; }*/
+    public DateTime? DateExpired { get; set; }
+    public string? ExpiredTime { get; set; }
+    [StringLength(500)]
+    public string? DetailBroken { get; set; }
+    public float? TotalBroken { get; set; }
+    public float SumTotal { get; set; }
     public float Price { get; set; }
     public float? LateFee { get; set; }
     public string? EmotorIds { get; set; }

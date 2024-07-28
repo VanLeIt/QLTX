@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QLTX.Data;
 using QLTX.Models;
+using QLTX.ViewModels;
 
 namespace QLTX.Controllers;
 
@@ -278,6 +279,32 @@ public class EMotorbikeController : Controller
 		return Json(result);
 	}
 
+	[HttpPost]
+	public async Task<JsonResult> ChangStatus(int id)
+	{
+		// Xác thực và cập nhật trạng thái của xe
+		bool result = false;
+		var motor = _context.EMotorbikes.Find(id);
+		if (motor != null)
+		{
+			result = true;
+            if (motor.Status == EMotorbikeStatus.Ready)
+            {
+                motor.Status = EMotorbikeStatus.Broken;
+				TempData["SuccessMessage"] = "Đã báo hỏng xe.";
+			}
+            else
+            {
+				motor.Status = EMotorbikeStatus.Ready;
+				TempData["SuccessMessage"] = "Đã phục hồi xe hỏng.";
+			}
+            
+			_context.SaveChanges();
+			
+
+		}
+		return Json(result);
+	}
 	private bool EMotorbikeExists(int id)
     {
         return (_context.EMotorbikes?.Any(e => e.Id == id)).GetValueOrDefault();

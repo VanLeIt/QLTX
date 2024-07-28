@@ -1,0 +1,273 @@
+﻿@model IEnumerable<QLTX.Models.Rental>
+
+@{
+	ViewData["Title"] = "IndexBill";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	int index = 0;
+}
+
+<main>
+	<div class="container-fluid px-4">
+		<h2 class="mt-4">Hóa đơn</h2>
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<div id="successMessage" class="alert alert-success alert-sm text-sm" role="alert">
+				@TempData["SuccessMessage"]
+			</div>
+		}
+		<div class="row mb-2">
+			<div class="col-6">Hóa đơn thuê xe</div>
+			<div class="col-6 d-flex justify-content-end">
+				@* <button class="btn btn-info mb-2" data-bs-toggle="modal" data-bs-target="#revenueModal">
+					Thống kê doanh thu
+				</button> *@
+			</div>
+		</div>
+		 
+		
+
+	 
+		<div class="card mb-4">
+			<div class="card-header">
+				<i class="fas fa-file-invoice"></i>
+				Danh sách hóa đơn
+			</div>
+			<div class="card-body table-responsive">
+				<table id="datatablesSimple" class="table table-striped" style="width:100%">
+					<thead>
+						<tr>
+							<th>STT</th>
+							<th>Khách hàng</th>
+							<th>Ngày bắt đầu</th>
+							<th>Ngày kết thúc</th>
+							<th>Tổng thời gian</th>
+							<th>Đơn giá</th> 
+							<th>Phí trễ hạn</th>
+							<th>Phí đền xe hỏng</th>
+							<th>Tổng tiền</th>
+
+							<th class="text-center text-lg-center"><i class="fas fa-sliders-h"></i></th>
+						</tr>
+					</thead>
+					<tbody>
+						@if (Model != null)
+						{
+							@foreach (var item in Model)
+							{
+								 
+
+								var serviceText = "";
+
+								switch (item.Service)
+								{
+									case RentalService.Hour:
+										serviceText = "Giờ";
+										break;
+									case RentalService.Day:
+										serviceText = "Ngày";
+										break;
+									case RentalService.Week:
+										serviceText = "Tuần";
+										break;
+								}
+
+
+								TimeSpan? overdueTime = null;
+								if (item.Status == RentalStatus.Expired)
+								{
+									overdueTime = DateTime.Now - item.DateRetalTo;
+
+
+								}
+
+								<tr>
+									<td>@(++index)</td>
+									<td><a asp-action="DetailBill" asp-route-id="@item.Id" style="text-decoration: none; color: black">@item.Customer.Name - @item.Customer.IdDocument</a></td>
+									<td>@item.DateRetalFrom.ToString("dd/MM/yyyy HH:mm")</td>
+									<td>@item.DateRetalTo.ToString("dd/MM/yyyy HH:mm")</td>
+									<td>@item.RetalTime @serviceText</td>
+									<td>@string.Format("{0:0,0} đ", item.Price)</td>
+									
+									@if (item.LateFee > 0)
+									{
+										<td>
+											@string.Format("{0:0,0} đ", item.LateFee)
+										</td>
+									}
+									else
+									{
+										<td>0</td>
+
+									}
+									@if (item.TotalBroken > 0)
+									{
+										<td>
+											@string.Format("{0:0,0} đ", item.TotalBroken)
+										</td>
+									}
+									else
+									{
+										<td>0</td>
+
+									}
+									<td>
+										@string.Format("{0:0,0} đ", item.SumTotal)
+									</td>
+									<td class="text-center text-lg-center">
+										 
+											 
+											<a asp-action="DetailBill" asp-route-id="@item.Id" class="text-info" style="margin-right:5px"><i class="fas fa-info-circle fa-lg" data-bs-toggle="tooltip" data-bs-placement="top" title="Xem chi tiết"></i></a>
+											@* <a onclick="Confirm(@item.Id)" class="text-danger" style="margin-right:5px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Xóa"><i class="fas fa-trash-alt fa-lg"></i></a> *@
+											 
+									</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Bạn có chắc muốn xóa mục này!
+			</div>
+			<div class="modal-footer">
+				<form id="deleteForm" method="post">
+					<input type="hidden" id="deleteItemId" />
+					<button type="submit" class="btn btn-danger">Xác nhận</button>
+				</form>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+`
+<!-- Modal -->
+<div class="modal fade" id="revenueModal" tabindex="-1" aria-labelledby="revenueModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="revenueModalLabel">
+					<i class="fas fa-chart-line"></i> Thống kê doanh thu
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="d-grid gap-2 mb-3">
+					<button class="btn btn-primary" onclick="fetchRevenue('today')">Doanh thu hôm nay</button>
+					<button class="btn btn-primary" onclick="fetchRevenue('week')">Doanh thu trong tuần</button>
+					<button class="btn btn-primary" onclick="fetchRevenue('month')">Doanh thu trong tháng</button>
+					<button class="btn btn-primary" onclick="openCustomRange()">Doanh thu theo khoảng thời gian</button>
+				</div>
+				<div id="revenueResult" class="mb-3"></div>
+				<div id="customRange" class="mb-3" style="display: none;">
+					<input type="date" id="startDate" class="form-control mb-2" />
+					<input type="date" id="endDate" class="form-control mb-2" />
+					<button class="btn btn-primary" onclick="fetchRevenue('custom')">Tính toán</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+ 
+
+<style>
+	.bg-warning {
+		background-color: #ffc107;
+		color: white;
+	}
+
+	.bg-success {
+		background-color: #28a745;
+		color: white;
+	}
+
+	.bg-danger {
+		background-color: #dc3545;
+		color: white;
+	}
+</style>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script>
+		function openCustomRange() {
+			document.getElementById('customRange').style.display = 'block';
+		}
+
+		function fetchRevenue(period) {
+			let startDate = document.getElementById('startDate').value;
+			let endDate = document.getElementById('endDate').value;
+
+			$.ajax({
+				url: `/Rental/GetRevenueReport`,
+				type: 'GET',
+				data: {
+					startDate: startDate,
+					endDate: endDate,
+					period: period
+				},
+				success: function (response) {
+					document.getElementById('revenueResult').innerHTML =
+						`<strong>Doanh thu:</strong> ${response.revenue.toLocaleString('vi-VN')} đ`;
+					if (period === 'custom') { 
+						document.getElementById('customRange').style.display = 'block';
+					}
+				},
+				error: function () {
+					alert('Đã xảy ra lỗi khi gửi yêu cầu.');
+				}
+			});
+		}
+		// function fetchCustomRangeRevenue() {
+		// 	const startDate = document.getElementById('startDate').value;
+		// 	const endDate = document.getElementById('endDate').value;
+
+		// 	window.location.href = `/Rental/IndexBill?startDate=${startDate}&endDate=${endDate}`;
+		// }
+		setTimeout(function () {
+			var successMessage = document.getElementById("successMessage");
+			if (successMessage) {
+				successMessage.style.display = "none";
+			}
+		}, 3000);
+
+		function Confirm(id) {
+			document.getElementById('deleteItemId').value = id;
+		}
+
+		document.getElementById('deleteForm').addEventListener('submit', function (event) {
+			event.preventDefault();
+			var id = document.getElementById('deleteItemId').value;
+
+			$.ajax({
+				url: '/Rental/Delete/' + id,
+				type: 'POST',
+				success: function (response) {
+					if (response) {
+						window.location.reload();
+
+					} else {
+						alert('Đã xảy ra lỗi khi xóa mục này.');
+					}
+				},
+				error: function () {
+					alert('Đã xảy ra lỗi khi gửi yêu cầu xóa.');
+				}
+			});
+		});
+	</script>
+}

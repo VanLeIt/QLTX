@@ -1,0 +1,36 @@
+﻿@model QLTX.ViewModels.RentalBroken
+<main>
+    <div class="container-fluid px-4">
+        <h2 class="mt-4">Thông tin đền bù hỏng xe</h2>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item active">Đơn thuê xe</li>
+        </ol>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <form asp-action="RentalBroken" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="Id" /> 
+
+                    <div class="mb-3">
+                        <label asp-for="DetailBroken" class="control-label mb-2">Chi tiết hỏng xe</label>
+                       @*  <input asp-for="DetailBroken" class="form-control" /> *@
+                        <textarea asp-for="DetailBroken" class="form-control"></textarea>
+                        <span asp-validation-for="DetailBroken" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TotalBroken" class="control-label mb-2">Thành tiền đền bù hỏng xe</label>
+                        <input type="number" asp-for="TotalBroken" class="form-control"  />
+                        <span asp-validation-for="TotalBroken" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <a asp-action="Index" class="btn btn-secondary">Đóng</a>
+                        <button type="submit" class="btn btn-primary">Ghi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
